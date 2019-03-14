@@ -1,0 +1,5 @@
+*.jpg
+*.DS_Store
+*.dnn
+*.mlmodel
+*.zip

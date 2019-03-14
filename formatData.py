@@ -53,7 +53,7 @@ def formatImg(srcFolder, destFolder, size=100, genExtraData=False):
 		back.close()
 
 def main():
-	formatImg(srcFolder='testLabeled',destFolder='testFormatted',genExtraData=False)
+	formatImg(srcFolder='train',destFolder='trainFormatted',genExtraData=False)
 
 
 if __name__ == '__main__':
