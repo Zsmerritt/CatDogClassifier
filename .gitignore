@@ -1,5 +1,3 @@
-!/testFormatted/*.jpg
-*.jpg
 *.zip
 *.dnn
 *.mlmodel
