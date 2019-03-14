@@ -15,7 +15,7 @@ def formatImg(srcFolder, destFolder, size=100, genExtraData=False):
 
 	nameStartIndex=files[0].rfind("/")+1
 
-	for x, name in files:
+	for name in files:
 		#open and convert pic to RGB
 		pic=Image.open(name).convert("RGB")
 		#remove folders to make naming easier
@@ -53,7 +53,7 @@ def formatImg(srcFolder, destFolder, size=100, genExtraData=False):
 		back.close()
 
 def main():
-	formatImg(srcFolder='train',destFolder='trainFormatted',genExtraData=True)
+	formatImg(srcFolder='testLabeled',destFolder='testFormatted',genExtraData=False)
 
 
 if __name__ == '__main__':

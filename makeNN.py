@@ -166,7 +166,7 @@ def main():
 		#shuffle data to normalize & remove bias
 		data,labels=shuffleData(data,labels)
 		#calculate error of new model
-		acc=round(testModel(testData,testLabels,network)*10,2)
+		acc=round(testModel(testData,testLabels,network),3)
 		#adjust batch size according to accuracy
 		batchSize=adjustBatchSize(acc)
 		print('Accuracy before epoch: ',prevAcc,'Accuracy after epoch: ',acc)
