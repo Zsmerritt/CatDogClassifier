@@ -69,7 +69,7 @@ def model1():
 	model.save('model1.dnn') 
 
 def model2():
-	image_size=200
+	image_size=175
 
 	model = Sequential()
 	model.add(Conv2D(64, kernel_size=(3, 3), input_shape=(image_size, image_size, 3)))
@@ -100,9 +100,6 @@ def model2():
 	model.add(Activation('relu'))
 	model.add(Conv2D(512, kernel_size=(3, 3)))
 	model.add(Activation('relu'))
-
-	#check input shape after this layer
-
 	model.add(MaxPooling2D(pool_size=(2, 2)))
 
 
