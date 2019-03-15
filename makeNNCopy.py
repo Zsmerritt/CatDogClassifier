@@ -58,15 +58,13 @@ def main():
 	        batch_size=batch_size,
 	        class_mode='binary')
 
-	print(batch_size)
 
 	model.fit_generator(
 	        train_generator,
 	        steps_per_epoch=25000 // batch_size,
 	        epochs=50,
 	        validation_data=validation_generator,
-	        validation_steps=1000 // batch_size,
-			use_multiprocessing=True)
+	        validation_steps=1000 // batch_size)
 	model.save_weights('first_try.h5') 
 
 if __name__ == '__main__':
