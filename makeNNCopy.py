@@ -69,8 +69,10 @@ def model1():
 	model.save('model1.dnn') 
 
 def model2():
+	image_size=200
+
 	model = Sequential()
-	model.add(Conv2D(64, kernel_size=(3, 3), input_shape=(150, 150, 3)))
+	model.add(Conv2D(64, kernel_size=(3, 3), input_shape=(image_size, image_size, 3)))
 	model.add(Activation('relu'))
 	model.add(Conv2D(64, kernel_size=(3, 3)))
 	model.add(Activation('relu'))
@@ -98,6 +100,9 @@ def model2():
 	model.add(Activation('relu'))
 	model.add(Conv2D(512, kernel_size=(3, 3)))
 	model.add(Activation('relu'))
+
+	#check input shape after this layer
+
 	model.add(MaxPooling2D(pool_size=(2, 2)))
 
 
@@ -134,14 +139,14 @@ def model2():
 	# batches of augmented image data
 	train_generator = train_datagen.flow_from_directory(
 	        './data/train/',  # this is the target directory
-	        target_size=(150, 150),  # all images will be resized to 150x150
+	        target_size=(image_size, image_size),  # all images will be resized to 150x150
 	        batch_size=batch_size,
 	        class_mode='binary')  # since we use binary_crossentropy loss, we need binary labels
 
 	# this is a similar generator, for validation data
 	validation_generator = test_datagen.flow_from_directory(
 	        './data/testLabeled/',
-	        target_size=(150, 150),
+	        target_size=(image_size, image_size),
 	        batch_size=batch_size,
 	        class_mode='binary')
 
