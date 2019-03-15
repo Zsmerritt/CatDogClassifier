@@ -4,17 +4,16 @@ from PIL import Image
 def makeNetwork():
 
 	poolSize=(2,2)
-	dropout=0.2
+	dropout=0.3
 
 	model=keras.models.Sequential()
 	#convolutional layers
-	#model.add(keras.layers.Conv2D(32,kernel_size=(3,3),padding='same',activation=('relu'),input_shape=(100,100,3)))
-	model.add(keras.layers.Conv2D(128,kernel_size=(3,3),padding='same',activation=('relu')))
+	model.add(keras.layers.Conv2D(128,kernel_size=(5,5),padding='same',activation=('relu'), input_shape=(100,100,3)))
 	model.add(keras.layers.BatchNormalization())
 	model.add(keras.layers.MaxPooling2D(pool_size=(poolSize)))
 	model.add(keras.layers.Dropout(dropout))
 
-	model.add(keras.layers.Conv2D(256,kernel_size=(3,3),padding='same',activation=('relu')))
+	model.add(keras.layers.Conv2D(256,kernel_size=(5,5),padding='same',activation=('relu')))
 	model.add(keras.layers.BatchNormalization())
 	model.add(keras.layers.MaxPooling2D(pool_size=(poolSize)))
 	model.add(keras.layers.Dropout(dropout))
@@ -39,21 +38,9 @@ def makeNetwork():
 	model.add(keras.layers.MaxPooling2D(pool_size=(poolSize)))
 	model.add(keras.layers.Dropout(dropout))
 
-	#model.add(keras.layers.MaxPooling2D(pool_size=(2, 2)))
-	#model.add(keras.layers.Dropout(0.5))
-
-	#model.add(keras.layers.Conv2D(2048,kernel_size=(5,5),padding='same',activation=('relu')))
-	#model.add(keras.layers.Conv2D(4096,kernel_size=(5,5),padding='same',activation=('relu')))
-	#model.add(keras.layers.Conv2D(4096,kernel_size=(5,5),padding='same',activation=('relu')))
-
 	#flatten
 	model.add(keras.layers.Flatten())
 	#Dense layers
-	model.add(keras.layers.Dense(4096))
-	model.add(keras.layers.BatchNormalization())
-	model.add(keras.layers.Activation('relu'))
-	model.add(keras.layers.Dropout(dropout))
-
 	model.add(keras.layers.Dense(2048))
 	model.add(keras.layers.BatchNormalization())
 	model.add(keras.layers.Activation('relu'))
@@ -65,6 +52,11 @@ def makeNetwork():
 	model.add(keras.layers.Dropout(dropout))
 
 	model.add(keras.layers.Dense(512))
+	model.add(keras.layers.BatchNormalization())
+	model.add(keras.layers.Activation('relu'))
+	model.add(keras.layers.Dropout(dropout))
+
+	model.add(keras.layers.Dense(256))
 	model.add(keras.layers.BatchNormalization())
 	model.add(keras.layers.Activation('relu'))
 	model.add(keras.layers.Dropout(dropout))
