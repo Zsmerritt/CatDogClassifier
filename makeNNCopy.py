@@ -156,5 +156,10 @@ def model2():
 	model.save('model2.dnn') 
 
 
+def main():
+	model2()
+	model1()
+
+
 if __name__ == '__main__':
 	main()
