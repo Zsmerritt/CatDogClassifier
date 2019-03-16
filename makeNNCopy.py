@@ -73,9 +73,10 @@ def model1():
 
 def model2():
 
-	#config = tf.ConfigProto()
-	#config.gpu_options.per_process_gpu_memory_fraction = 0.3
-	#set_session(tf.Session(config=config))
+	config = tf.ConfigProto()
+	config.gpu_options.per_process_gpu_memory_fraction = 0.7
+	config.gpu_options.allow_growth = True  
+	set_session(tf.Session(config=config))
 
 	image_size=160
 	dropout=0.3
@@ -178,7 +179,7 @@ def model2():
 
 
 def main():
-	#model2()
+	model2()
 	model1()
 
 
