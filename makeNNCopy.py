@@ -179,7 +179,7 @@ def model2():
 
 
 def main():
-	model2()
+	#model2()
 	model1()
 
 
