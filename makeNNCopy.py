@@ -2,6 +2,9 @@ from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
+import tensorflow as tf
+from keras.backend.tensorflow_backend import set_session
+
 
 
 def model1():
@@ -69,6 +72,11 @@ def model1():
 	model.save('model1.dnn') 
 
 def model2():
+
+	config = tf.ConfigProto()
+	config.gpu_options.per_process_gpu_memory_fraction = 0.7
+	set_session(tf.Session(config=config))
+
 	image_size=160
 	dropout=0.3
 
