@@ -113,13 +113,13 @@ def model2():
 
 	model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
 
-	model.add(Dense(256))
+	model.add(Dense(256, kernel_initializer=keras.initializers.Orthogonal(gain=1.0, seed=None)))
 	model.add(Activation('relu'))
-	model.add(Dense(128))
+	model.add(Dense(128, kernel_initializer=keras.initializers.Orthogonal(gain=1.0, seed=None)))
 	model.add(Activation('relu'))
-	model.add(Dense(64))
+	model.add(Dense(64, kernel_initializer=keras.initializers.Orthogonal(gain=1.0, seed=None)))
 	model.add(Activation('relu'))
-	model.add(Dense(32))
+	model.add(Dense(32, kernel_initializer=keras.initializers.Orthogonal(gain=1.0, seed=None)))
 	model.add(Activation('relu'))
 	model.add(Dropout(dropout))
 	model.add(Dense(1))
