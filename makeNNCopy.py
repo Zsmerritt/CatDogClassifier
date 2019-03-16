@@ -2,6 +2,7 @@ from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
+from keras import initializers
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 
@@ -113,13 +114,13 @@ def model2():
 
 	model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
 
-	model.add(Dense(256, kernel_initializer=keras.initializers.Orthogonal(gain=1.0, seed=None)))
+	model.add(Dense(256, kernel_initializer=initializers.Orthogonal(gain=1.0, seed=None)))
 	model.add(Activation('relu'))
-	model.add(Dense(128, kernel_initializer=keras.initializers.Orthogonal(gain=1.0, seed=None)))
+	model.add(Dense(128, kernel_initializer=initializers.Orthogonal(gain=1.0, seed=None)))
 	model.add(Activation('relu'))
-	model.add(Dense(64, kernel_initializer=keras.initializers.Orthogonal(gain=1.0, seed=None)))
+	model.add(Dense(64, kernel_initializer=initializers.Orthogonal(gain=1.0, seed=None)))
 	model.add(Activation('relu'))
-	model.add(Dense(32, kernel_initializer=keras.initializers.Orthogonal(gain=1.0, seed=None)))
+	model.add(Dense(32, kernel_initializer=initializers.Orthogonal(gain=1.0, seed=None)))
 	model.add(Activation('relu'))
 	model.add(Dropout(dropout))
 	model.add(Dense(1))
