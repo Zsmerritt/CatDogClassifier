@@ -96,7 +96,7 @@ def model2():
 	model.add(Activation('relu'))
 	model.add(Conv2D(128, kernel_size=kernel_size))
 	model.add(Activation('relu'))
-	model.add(MaxPooling2D(pool_size=pool_size)
+	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 
 
@@ -104,7 +104,7 @@ def model2():
 	model.add(Activation('relu'))
 	model.add(Conv2D(256, kernel_size=kernel_size))
 	model.add(Activation('relu'))
-	model.add(MaxPooling2D(pool_size=pool_size)
+	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 
 
@@ -112,7 +112,7 @@ def model2():
 	model.add(Activation('relu'))
 	model.add(Conv2D(512, kernel_size=kernel_size))
 	model.add(Activation('relu'))
-	model.add(MaxPooling2D(pool_size=pool_size)
+	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 
 
@@ -120,7 +120,7 @@ def model2():
 	model.add(Activation('relu'))
 	model.add(Conv2D(512, kernel_size=kernel_size))
 	model.add(Activation('relu'))
-	model.add(MaxPooling2D(pool_size=pool_size)
+	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 
 
