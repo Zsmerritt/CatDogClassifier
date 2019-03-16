@@ -78,7 +78,7 @@ def model1():
 
 def model2():
 
-	image_size=250
+	image_size=200
 	dropout=0.5
 	kernel_size=(3,3)
 	pool_size=(2,2)
@@ -110,14 +110,6 @@ def model2():
 	model.add(Activation('relu'))
 	model.add(MaxPooling2D(pool_size=pool_size))
 
-
-	model.add(Conv2D(512, kernel_size=kernel_size))
-	model.add(Activation('relu'))
-	model.add(MaxPooling2D(pool_size=pool_size))
-
-	model.add(Conv2D(512, kernel_size=kernel_size))
-	model.add(Activation('relu'))
-	model.add(MaxPooling2D(pool_size=pool_size))
 
 	model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
 
