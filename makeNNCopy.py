@@ -78,7 +78,7 @@ def model1():
 
 def model2():
 
-	image_size=200
+	image_size=250
 	dropout=0.5
 	kernel_size=(3,3)
 	pool_size=(2,2)
