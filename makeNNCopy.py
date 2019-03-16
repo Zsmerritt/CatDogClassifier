@@ -74,7 +74,7 @@ def model1():
 def model2():
 
 	image_size=160
-	dropout=0.3
+	dropout=0.5
 
 	model = Sequential()
 	model.add(Conv2D(64, kernel_size=(3, 3), input_shape=(image_size, image_size, 3)))
@@ -119,11 +119,17 @@ def model2():
 
 
 	model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
-	model.add(Dense(4096))
+	model.add(Dense(1024))
 	model.add(Activation('relu'))
-	model.add(Dense(4096))
+	model.add(Dense(512))
 	model.add(Activation('relu'))
-	model.add(Dense(4096))
+	model.add(Dense(256))
+	model.add(Activation('relu'))
+	model.add(Dense(128))
+	model.add(Activation('relu'))
+	model.add(Dense(64))
+	model.add(Activation('relu'))
+	model.add(Dense(32))
 	model.add(Activation('relu'))
 	model.add(Dropout(dropout))
 	model.add(Dense(1))
