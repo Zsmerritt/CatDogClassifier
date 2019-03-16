@@ -39,7 +39,12 @@ def model1():
 	        rescale=1./255,
 	        shear_range=0.2,
 	        zoom_range=0.2,
-	        horizontal_flip=True)
+	        horizontal_flip=True,
+	        rotation_range=40,
+	        width_shift_range=0.2,
+	        height_shift_range=0.2,
+	        fill_mode='nearest')
+
 
 	# this is the augmentation configuration we will use for testing:
 	# only rescaling
@@ -146,7 +151,11 @@ def model2():
 	        rescale=1./255,
 	        shear_range=0.2,
 	        zoom_range=0.2,
-	        horizontal_flip=True)
+	        horizontal_flip=True,
+	        rotation_range=40,
+	        width_shift_range=0.2,
+	        height_shift_range=0.2,
+	        fill_mode='nearest')
 
 	# this is the augmentation configuration we will use for testing:
 	# only rescaling
