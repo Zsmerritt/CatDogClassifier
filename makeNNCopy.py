@@ -69,7 +69,7 @@ def model1():
 	model.save('model1.dnn') 
 
 def model2():
-	image_size=150
+	image_size=160
 	dropout=0.3
 
 	model = Sequential()
