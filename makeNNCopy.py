@@ -74,7 +74,7 @@ def model1():
 def model2():
 
 	config = tf.ConfigProto()
-	config.gpu_options.per_process_gpu_memory_fraction = 0.7
+	config.gpu_options.per_process_gpu_memory_fraction = 0.6
 	set_session(tf.Session(config=config))
 
 	image_size=160
