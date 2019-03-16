@@ -84,41 +84,41 @@ def model2():
 	pool_size=(2,2)
 
 	model = Sequential()
-	model.add(Conv2D(64, kernel_size=kernel_size, input_shape=(image_size, image_size, 3)))
+	model.add(Conv2D(64, kernel_size=kernel_size, padding='same', input_shape=(image_size, image_size, 3)))
 	model.add(Activation('relu'))
-	model.add(Conv2D(64, kernel_size=kernel_size))
-	model.add(Activation('relu'))
-	model.add(MaxPooling2D(pool_size=pool_size))
-	model.add(Dropout(dropout))
-
-
-	model.add(Conv2D(128, kernel_size=kernel_size))
-	model.add(Activation('relu'))
-	model.add(Conv2D(128, kernel_size=kernel_size))
+	model.add(Conv2D(64, kernel_size=kernel_size, padding='same'))
 	model.add(Activation('relu'))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 
 
-	model.add(Conv2D(256, kernel_size=kernel_size))
+	model.add(Conv2D(128, kernel_size=kernel_size, padding='same'))
 	model.add(Activation('relu'))
-	model.add(Conv2D(256, kernel_size=kernel_size))
-	model.add(Activation('relu'))
-	model.add(MaxPooling2D(pool_size=pool_size))
-	model.add(Dropout(dropout))
-
-
-	model.add(Conv2D(512, kernel_size=kernel_size))
-	model.add(Activation('relu'))
-	model.add(Conv2D(512, kernel_size=kernel_size))
+	model.add(Conv2D(128, kernel_size=kernel_size, padding='same'))
 	model.add(Activation('relu'))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 
 
-	model.add(Conv2D(512, kernel_size=kernel_size))
+	model.add(Conv2D(256, kernel_size=kernel_size, padding='same'))
 	model.add(Activation('relu'))
-	model.add(Conv2D(512, kernel_size=kernel_size))
+	model.add(Conv2D(256, kernel_size=kernel_size, padding='same'))
+	model.add(Activation('relu'))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+
+
+	model.add(Conv2D(512, kernel_size=kernel_size, padding='same'))
+	model.add(Activation('relu'))
+	model.add(Conv2D(512, kernel_size=kernel_size, padding='same'))
+	model.add(Activation('relu'))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+
+
+	model.add(Conv2D(512, kernel_size=kernel_size, padding='same'))
+	model.add(Activation('relu'))
+	model.add(Conv2D(512, kernel_size=kernel_size, padding='same'))
 	model.add(Activation('relu'))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
