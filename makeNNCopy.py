@@ -1,10 +1,8 @@
 from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense
+from keras.layers import Conv2D, MaxPooling2D, Activation, Dropout, Flatten, Dense, BatchNormalization
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
 from keras import initializers
-import tensorflow as tf
-from keras.backend.tensorflow_backend import set_session
+from copy import deepcopy
 
 
 
@@ -80,49 +78,65 @@ def model1():
 def model2():
 
 	image_size=200
-	dropout=0.5
+	dropout=0.2
 	kernel_size=(3,3)
 	pool_size=(2,2)
 
 	model = Sequential()
-	model.add(Conv2D(64, kernel_size=kernel_size, input_shape=(image_size, image_size, 3), kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Conv2D(32, kernel_size=kernel_size, input_shape=(image_size, image_size, 3), kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
+	model.add(BatchNormalization(axis=1, momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+
+	model.add(Conv2D(32, kernel_size=kernel_size, kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(axis=1, momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
 
 	model.add(Conv2D(64, kernel_size=kernel_size, kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
+	model.add(BatchNormalization(axis=1, momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
 
+	model.add(Conv2D(64, kernel_size=kernel_size, kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(axis=1, momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
 
 	model.add(Conv2D(128, kernel_size=kernel_size, kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
+	model.add(BatchNormalization(axis=1, momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
 
 	model.add(Conv2D(128, kernel_size=kernel_size, kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
+	model.add(BatchNormalization(axis=1, momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
-
-
-	model.add(Conv2D(256, kernel_size=kernel_size, kernel_initializer=initializers.he_normal(seed=None)))
-	model.add(Activation('relu'))
-	model.add(MaxPooling2D(pool_size=pool_size))
-
-	model.add(Conv2D(256, kernel_size=kernel_size, kernel_initializer=initializers.he_normal(seed=None)))
-	model.add(Activation('relu'))
-	model.add(MaxPooling2D(pool_size=pool_size))
-
+	model.add(Dropout(dropout))
 
 	model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
 
 	model.add(Dense(256, kernel_initializer=initializers.lecun_normal(seed=None)))
 	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
 	model.add(Dense(128, kernel_initializer=initializers.lecun_normal(seed=None)))
 	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
 	model.add(Dense(64, kernel_initializer=initializers.lecun_normal(seed=None)))
 	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
 	model.add(Dense(32, kernel_initializer=initializers.lecun_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(Dropout(dropout))
+
 	model.add(Dense(1))
 	model.add(Activation('sigmoid'))
 
@@ -163,14 +177,26 @@ def model2():
 	        batch_size=batch_size,
 	        class_mode='binary')
 
+	modelList=[]
+	for x in range(10):
+		model.fit_generator(
+		        train_generator,
+		        steps_per_epoch=25000 // batch_size,
+		        epochs=1,
+		        validation_data=validation_generator,
+		        validation_steps=1000 // batch_size)
+		modelList.append(deepcopy(model))
 
-	model.fit_generator(
-	        train_generator,
-	        steps_per_epoch=25000 // batch_size,
-	        epochs=50,
-	        validation_data=validation_generator,
-	        validation_steps=1000 // batch_size)
-	model.save_weights('first_try2.h5')
+	bestModel=model
+	bestModelAcc=model.evaluate_generator(validation_generator)
+	for model in modelList:
+		curModelAcc=model.evaluate_generator(validation_generator)
+		if curModelAcc>bestModelAcc:
+			bestModel=model
+			bestModelAcc=curModelAcc
+
+	print(bestModelAcc)
+	model.save_weights('model2Weights.h5')
 	model.save('model2.dnn') 
 
 
