@@ -85,42 +85,42 @@ def model2():
 	pool_size=(2,2)
 
 	model = Sequential()
-	model.add(Conv2D(64, kernel_size=kernel_size, input_shape=(image_size, image_size, 3)))
+	model.add(Conv2D(64, kernel_size=kernel_size, input_shape=(image_size, image_size, 3), kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(MaxPooling2D(pool_size=pool_size))
 
-	model.add(Conv2D(64, kernel_size=kernel_size))
-	model.add(Activation('relu'))
-	model.add(MaxPooling2D(pool_size=pool_size))
-
-
-	model.add(Conv2D(128, kernel_size=kernel_size))
-	model.add(Activation('relu'))
-	model.add(MaxPooling2D(pool_size=pool_size))
-
-	model.add(Conv2D(128, kernel_size=kernel_size))
+	model.add(Conv2D(64, kernel_size=kernel_size, kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(MaxPooling2D(pool_size=pool_size))
 
 
-	model.add(Conv2D(256, kernel_size=kernel_size))
+	model.add(Conv2D(128, kernel_size=kernel_size, kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(MaxPooling2D(pool_size=pool_size))
 
-	model.add(Conv2D(256, kernel_size=kernel_size))
+	model.add(Conv2D(128, kernel_size=kernel_size, kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(MaxPooling2D(pool_size=pool_size))
+
+
+	model.add(Conv2D(256, kernel_size=kernel_size, kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(MaxPooling2D(pool_size=pool_size))
+
+	model.add(Conv2D(256, kernel_size=kernel_size, kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(MaxPooling2D(pool_size=pool_size))
 
 
 	model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
 
-	model.add(Dense(256, kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Dense(256, kernel_initializer=initializers.lecun_normal(seed=None)))
 	model.add(Activation('relu'))
-	model.add(Dense(128, kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Dense(128, kernel_initializer=initializers.lecun_normal(seed=None)))
 	model.add(Activation('relu'))
-	model.add(Dense(64, kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Dense(64, kernel_initializer=initializers.lecun_normal(seed=None)))
 	model.add(Activation('relu'))
-	model.add(Dense(32, kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Dense(32, kernel_initializer=initializers.lecun_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(Dropout(dropout))
 	model.add(Dense(1))
