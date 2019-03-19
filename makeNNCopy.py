@@ -178,7 +178,7 @@ def model2():
 	        class_mode='binary')
 
 	modelList=[]
-	for x in range(10):
+	for x in range(3):
 		model.fit_generator(
 		        train_generator,
 		        steps_per_epoch=25000 // batch_size,
@@ -188,16 +188,16 @@ def model2():
 		modelList.append(deepcopy(model))
 
 	bestModel=model
-	bestModelAcc=model.evaluate_generator(validation_generator)
+	bestModelLoss,bestModelAcc=model.evaluate_generator(validation_generator)
 	for model in modelList:
-		curModelAcc=model.evaluate_generator(validation_generator)
+		curModelLoss,curModelAcc=model.evaluate_generator(validation_generator)
 		if curModelAcc>bestModelAcc:
 			bestModel=model
 			bestModelAcc=curModelAcc
 
-	print(bestModelAcc)
+	print('Best Accuracy: ',bestModelAcc,' Best Loss: ',bestModelLoss)
 	model.save_weights('model2Weights.h5')
-	model.save('model2.dnn') 
+	model.save('model2'+str(round(bestModelAcc,5))+'.dnn') 
 
 
 def main():
