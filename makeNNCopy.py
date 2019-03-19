@@ -85,7 +85,7 @@ def model2():
 	model = Sequential()
 	model.add(Conv2D(32, kernel_size=kernel_size, input_shape=(image_size, image_size, 3), kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
-	model.add(BatchNormalization(axis=1, momentum=0.99, epsilon=0.001))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 
