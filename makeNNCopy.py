@@ -178,7 +178,7 @@ def model2():
 	        class_mode='binary')
 
 	modelList=[]
-	for x in range(3):
+	for x in range(60):
 		model.fit_generator(
 		        train_generator,
 		        steps_per_epoch=25000 // batch_size,
@@ -197,8 +197,15 @@ def model2():
 
 	print('Best Accuracy: ',bestModelAcc,' Best Loss: ',bestModelLoss)
 	model.save_weights('model2Weights.h5')
-	model.save('model2'+str(round(bestModelAcc,5))+'.dnn') 
+	model.save('model2_'+str(round(bestModelAcc,5))+'.dnn') 
 
+def calBatchSize(epoch):
+	if epoch<=20:
+		return 16
+	elif epoch<=40:
+		return 32
+	else:
+		return 64
 
 def main():
 	model2()
