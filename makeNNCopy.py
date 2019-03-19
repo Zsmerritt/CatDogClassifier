@@ -6,7 +6,7 @@ from copy import deepcopy
 
 
 
-def model1():
+def modelOld():
 	model = Sequential()
 	model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(150, 150, 3)))
 	model.add(Activation('relu'))
@@ -75,7 +75,7 @@ def model1():
 	model.save_weights('first_try1.h5')
 	model.save('model1.dnn') 
 
-def model2():
+def genModel():
 
 	image_size=200
 	dropout=0.2
@@ -177,31 +177,20 @@ def model2():
 	        batch_size=batch_size,
 	        class_mode='binary')
 
-	modelList=[]
-	for x in range(1,101):
+	for x in range(1,121):
 		print('training epoch:',x)
 		batch_size=calBatchSize(x)
-		output=model.fit_generator(
+		model.fit_generator(
 		        train_generator,
 		        steps_per_epoch=25000 // batch_size,
 		        epochs=1,
 		        validation_data=validation_generator,
 		        validation_steps=1000 // batch_size,
 		        verbose=1)
-		print(output)
-		modelList.append(deepcopy(model))
+		loss,acc=model.evaluate_generator(validation_generator)
+		model.save_weights('./weights/weights_'+str(round(acc,5))+'.h5')
+		model.save('./models/model_'+str(round(acc,5))+'.dnn') 
 
-	bestModel=model
-	bestModelLoss,bestModelAcc=model.evaluate_generator(validation_generator)
-	for model in modelList:
-		curModelLoss,curModelAcc=model.evaluate_generator(validation_generator)
-		if curModelAcc>bestModelAcc:
-			bestModel=model
-			bestModelAcc=curModelAcc
-
-	print('Best Accuracy: ',bestModelAcc,' Best Loss: ',bestModelLoss)
-	model.save_weights('model2Weights.h5')
-	model.save('model2_'+str(round(bestModelAcc,5))+'.dnn') 
 
 def calBatchSize(epoch):
 	if epoch<=20:
@@ -212,11 +201,14 @@ def calBatchSize(epoch):
 		return 64
 	elif epoch<=80:
 		return 128
-	else:
+	elif epoch <=100:
 		return 256
+	else:
+		return 512
+
 
 def main():
-	model2()
+	genModel()
 
 
 if __name__ == '__main__':
