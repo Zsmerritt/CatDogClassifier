@@ -178,15 +178,16 @@ def model2():
 	        class_mode='binary')
 
 	modelList=[]
-	for x in range(1,61):
+	for x in range(1,101):
 		print('training epoch:',x)
+		batch_size=calBatchSize(x)
 		output=model.fit_generator(
 		        train_generator,
 		        steps_per_epoch=25000 // batch_size,
 		        epochs=1,
 		        validation_data=validation_generator,
-		        validation_steps=1000 // batch_size)
-		batch_size=calBatchSize(x)
+		        validation_steps=1000 // batch_size,
+		        verbose=1)
 		print(output)
 		modelList.append(deepcopy(model))
 
@@ -207,12 +208,15 @@ def calBatchSize(epoch):
 		return 16
 	elif epoch<=40:
 		return 32
-	else:
+	elif epoch<=60:
 		return 64
+	elif epoch<=80:
+		return 128
+	else:
+		return 256
 
 def main():
 	model2()
-	model1()
 
 
 if __name__ == '__main__':
