@@ -178,13 +178,16 @@ def model2():
 	        class_mode='binary')
 
 	modelList=[]
-	for x in range(60):
-		model.fit_generator(
+	for x in range(1,61):
+		print('training epoch:',x)
+		output=model.fit_generator(
 		        train_generator,
 		        steps_per_epoch=25000 // batch_size,
 		        epochs=1,
 		        validation_data=validation_generator,
 		        validation_steps=1000 // batch_size)
+		batch_size=calBatchSize(x)
+		print(output)
 		modelList.append(deepcopy(model))
 
 	bestModel=model
