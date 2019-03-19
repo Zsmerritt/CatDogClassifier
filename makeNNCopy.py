@@ -186,7 +186,8 @@ def genModel():
 		        epochs=1,
 		        validation_data=validation_generator,
 		        validation_steps=1000 // batch_size,
-		        verbose=1)
+		        verbose=1,
+		        max_queue_size=25)
 		loss,acc=model.evaluate_generator(validation_generator)
 		model.save_weights('./weights/weights_'+str(round(acc,5))+'.h5')
 		model.save('./models/model_'+str(round(acc,5))+'.dnn') 
