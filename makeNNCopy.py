@@ -78,7 +78,7 @@ def modelOld():
 #~90%
 def model_original():
 
-	image_size=300
+	image_size=200
 	dropout=0.2
 	kernel_size=(3,3)
 	pool_size=(2,2)
