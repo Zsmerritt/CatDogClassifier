@@ -121,9 +121,11 @@ def genModel():
 
 	model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
 
+	#~90% without following layers
 	model.add(Dense(512, kernel_initializer=initializers.lecun_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(Dropout(dropout))
+	#end
 
 	model.add(Dense(256, kernel_initializer=initializers.lecun_normal(seed=None)))
 	model.add(Activation('relu'))
