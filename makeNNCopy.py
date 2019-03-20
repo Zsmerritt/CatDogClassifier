@@ -149,7 +149,7 @@ def model_original():
 	batch_size = 16
 
 	for x in range(1,121):
-		print('training epoch:',x)
+		print('model: og, training epoch:',x)
 		batch_size=calBatchSize(x)
 		model.fit_generator(
 		        trainGenerator(image_size,batch_size),
@@ -250,7 +250,7 @@ def model_1():
 	batch_size = 16
 
 	for x in range(1,121):
-		print('training epoch:',x)
+		print('model: 1, training epoch:',x)
 		batch_size=calBatchSize(x)
 		model.fit_generator(
 		        trainGenerator(image_size,batch_size),
@@ -338,7 +338,7 @@ def model_2():
 	batch_size = 16
 
 	for x in range(1,121):
-		print('training epoch:',x)
+		print('model: 2, training epoch:',x)
 		batch_size=calBatchSize(x)
 		model.fit_generator(
 		        trainGenerator(image_size,batch_size),
@@ -442,7 +442,7 @@ def model_3():
 	batch_size = 16
 
 	for x in range(1,121):
-		print('training epoch:',x)
+		print('model: 3, training epoch:',x)
 		batch_size=calBatchSize(x)
 		model.fit_generator(
 		        trainGenerator(image_size,batch_size),
