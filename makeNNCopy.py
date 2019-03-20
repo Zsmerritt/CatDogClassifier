@@ -5,6 +5,39 @@ from keras import initializers
 from copy import deepcopy
 
 
+# this is the augmentation configuration we will use for training
+train_datagen = ImageDataGenerator(
+        rescale=1./255,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=True,
+        rotation_range=40,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        fill_mode='nearest')
+
+
+# this is the augmentation configuration we will use for testing:
+# only rescaling
+test_datagen = ImageDataGenerator(rescale=1./255)
+
+# this is a generator that will read pictures found in
+# subfolers of 'data/train', and indefinitely generate
+# batches of augmented image data
+def trainGenerator(size, batch):
+	return train_datagen.flow_from_directory(
+        './data/train/',  # this is the target directory
+        target_size=(size, size),  # all images will be resized to 150x150
+        batch_size=batch,
+        class_mode='binary')  # since we use binary_crossentropy loss, we need binary labels
+
+def validationGenerator(size, batch):
+# this is a similar generator, for validation data
+	return test_datagen.flow_from_directory(
+        './data/testLabeled/',
+        target_size=(size, size),
+        batch_size=batch,
+        class_mode='binary')
 
 def modelOld():
 	model = Sequential()
@@ -33,47 +66,15 @@ def modelOld():
 
 	batch_size = 16
 
-	# this is the augmentation configuration we will use for training
-	train_datagen = ImageDataGenerator(
-	        rescale=1./255,
-	        shear_range=0.2,
-	        zoom_range=0.2,
-	        horizontal_flip=True,
-	        rotation_range=40,
-	        width_shift_range=0.2,
-	        height_shift_range=0.2,
-	        fill_mode='nearest')
-
-
-	# this is the augmentation configuration we will use for testing:
-	# only rescaling
-	test_datagen = ImageDataGenerator(rescale=1./255)
-
-	# this is a generator that will read pictures found in
-	# subfolers of 'data/train', and indefinitely generate
-	# batches of augmented image data
-	train_generator = train_datagen.flow_from_directory(
-	        './data/train/',  # this is the target directory
-	        target_size=(150, 150),  # all images will be resized to 150x150
-	        batch_size=batch_size,
-	        class_mode='binary')  # since we use binary_crossentropy loss, we need binary labels
-
-	# this is a similar generator, for validation data
-	validation_generator = test_datagen.flow_from_directory(
-	        './data/testLabeled/',
-	        target_size=(150, 150),
-	        batch_size=batch_size,
-	        class_mode='binary')
-
-
 	model.fit_generator(
-	        train_generator,
+	        trainGenerator(image_size,batch_size),
 	        steps_per_epoch=25000 // batch_size,
 	        epochs=50,
-	        validation_data=validation_generator,
+	        validation_data=validationGenerator(image_size,batch_size),
 	        validation_steps=1000 // batch_size)
 	model.save_weights('first_try1.h5')
 	model.save('model1.dnn') 
+
 
 #~90%
 def model_original():
@@ -147,52 +148,22 @@ def model_original():
 
 	batch_size = 16
 
-	# this is the augmentation configuration we will use for training
-	train_datagen = ImageDataGenerator(
-	        rescale=1./255,
-	        shear_range=0.2,
-	        zoom_range=0.2,
-	        horizontal_flip=True,
-	        rotation_range=40,
-	        width_shift_range=0.2,
-	        height_shift_range=0.2,
-	        fill_mode='nearest')
-
-	# this is the augmentation configuration we will use for testing:
-	# only rescaling
-	test_datagen = ImageDataGenerator(rescale=1./255)
-
-	# this is a generator that will read pictures found in
-	# subfolers of 'data/train', and indefinitely generate
-	# batches of augmented image data
-	train_generator = train_datagen.flow_from_directory(
-	        './data/train/',  # this is the target directory
-	        target_size=(image_size, image_size),  # all images will be resized to 150x150
-	        batch_size=batch_size,
-	        class_mode='binary')  # since we use binary_crossentropy loss, we need binary labels
-
-	# this is a similar generator, for validation data
-	validation_generator = test_datagen.flow_from_directory(
-	        './data/testLabeled/',
-	        target_size=(image_size, image_size),
-	        batch_size=batch_size,
-	        class_mode='binary')
-
 	for x in range(1,121):
 		print('training epoch:',x)
 		batch_size=calBatchSize(x)
 		model.fit_generator(
-		        train_generator,
+		        trainGenerator(image_size,batch_size),
 		        steps_per_epoch=25000 // batch_size,
 		        epochs=1,
-		        validation_data=validation_generator,
+		        validation_data=validationGenerator(image_size,batch_size),
 		        validation_steps=1000 // batch_size,
 		        verbose=1,
 		        max_queue_size=25)
-		loss,acc=model.evaluate_generator(validation_generator)
+		loss,acc=model.evaluate_generator(validationGenerator(image_size,batch_size))
 		model.save_weights('./weights/weights_'+str(round(acc,5))+'.h5')
 		model.save('./models/model_'+str(round(acc,5))+'.dnn') 
 
+#added in two additional conv layers
 def model_1():
 
 	image_size=300
@@ -278,52 +249,22 @@ def model_1():
 
 	batch_size = 16
 
-	# this is the augmentation configuration we will use for training
-	train_datagen = ImageDataGenerator(
-	        rescale=1./255,
-	        shear_range=0.2,
-	        zoom_range=0.2,
-	        horizontal_flip=True,
-	        rotation_range=40,
-	        width_shift_range=0.2,
-	        height_shift_range=0.2,
-	        fill_mode='nearest')
-
-	# this is the augmentation configuration we will use for testing:
-	# only rescaling
-	test_datagen = ImageDataGenerator(rescale=1./255)
-
-	# this is a generator that will read pictures found in
-	# subfolers of 'data/train', and indefinitely generate
-	# batches of augmented image data
-	train_generator = train_datagen.flow_from_directory(
-	        './data/train/',  # this is the target directory
-	        target_size=(image_size, image_size),  # all images will be resized to 150x150
-	        batch_size=batch_size,
-	        class_mode='binary')  # since we use binary_crossentropy loss, we need binary labels
-
-	# this is a similar generator, for validation data
-	validation_generator = test_datagen.flow_from_directory(
-	        './data/testLabeled/',
-	        target_size=(image_size, image_size),
-	        batch_size=batch_size,
-	        class_mode='binary')
-
 	for x in range(1,121):
 		print('training epoch:',x)
 		batch_size=calBatchSize(x)
 		model.fit_generator(
-		        train_generator,
+		        trainGenerator(image_size,batch_size),
 		        steps_per_epoch=25000 // batch_size,
 		        epochs=1,
-		        validation_data=validation_generator,
+		        validation_data=validationGenerator(image_size,batch_size),
 		        validation_steps=1000 // batch_size,
 		        verbose=1,
 		        max_queue_size=25)
-		loss,acc=model.evaluate_generator(validation_generator)
+		loss,acc=model.evaluate_generator(validationGenerator(image_size,batch_size))
 		model.save_weights('./weights/weights_'+str(round(acc,5))+'.h5')
 		model.save('./models/model_'+str(round(acc,5))+'.dnn') 
 
+#increased Dropout rate
 def model_2():
 
 	image_size=200
@@ -396,52 +337,22 @@ def model_2():
 
 	batch_size = 16
 
-	# this is the augmentation configuration we will use for training
-	train_datagen = ImageDataGenerator(
-	        rescale=1./255,
-	        shear_range=0.2,
-	        zoom_range=0.2,
-	        horizontal_flip=True,
-	        rotation_range=40,
-	        width_shift_range=0.2,
-	        height_shift_range=0.2,
-	        fill_mode='nearest')
-
-	# this is the augmentation configuration we will use for testing:
-	# only rescaling
-	test_datagen = ImageDataGenerator(rescale=1./255)
-
-	# this is a generator that will read pictures found in
-	# subfolers of 'data/train', and indefinitely generate
-	# batches of augmented image data
-	train_generator = train_datagen.flow_from_directory(
-	        './data/train/',  # this is the target directory
-	        target_size=(image_size, image_size),  # all images will be resized to 150x150
-	        batch_size=batch_size,
-	        class_mode='binary')  # since we use binary_crossentropy loss, we need binary labels
-
-	# this is a similar generator, for validation data
-	validation_generator = test_datagen.flow_from_directory(
-	        './data/testLabeled/',
-	        target_size=(image_size, image_size),
-	        batch_size=batch_size,
-	        class_mode='binary')
-
 	for x in range(1,121):
 		print('training epoch:',x)
 		batch_size=calBatchSize(x)
 		model.fit_generator(
-		        train_generator,
+		        trainGenerator(image_size,batch_size),
 		        steps_per_epoch=25000 // batch_size,
 		        epochs=1,
-		        validation_data=validation_generator,
+		        validation_data=validationGenerator(image_size,batch_size),
 		        validation_steps=1000 // batch_size,
 		        verbose=1,
 		        max_queue_size=25)
-		loss,acc=model.evaluate_generator(validation_generator)
+		loss,acc=model.evaluate_generator(validationGenerator(image_size,batch_size))
 		model.save_weights('./weights/weights_'+str(round(acc,5))+'.h5')
 		model.save('./models/model_'+str(round(acc,5))+'.dnn') 
 
+#added more fully connected dense layers
 def model_3():
 
 	image_size=200
@@ -530,49 +441,18 @@ def model_3():
 
 	batch_size = 16
 
-	# this is the augmentation configuration we will use for training
-	train_datagen = ImageDataGenerator(
-	        rescale=1./255,
-	        shear_range=0.2,
-	        zoom_range=0.2,
-	        horizontal_flip=True,
-	        rotation_range=40,
-	        width_shift_range=0.2,
-	        height_shift_range=0.2,
-	        fill_mode='nearest')
-
-	# this is the augmentation configuration we will use for testing:
-	# only rescaling
-	test_datagen = ImageDataGenerator(rescale=1./255)
-
-	# this is a generator that will read pictures found in
-	# subfolers of 'data/train', and indefinitely generate
-	# batches of augmented image data
-	train_generator = train_datagen.flow_from_directory(
-	        './data/train/',  # this is the target directory
-	        target_size=(image_size, image_size),  # all images will be resized to 150x150
-	        batch_size=batch_size,
-	        class_mode='binary')  # since we use binary_crossentropy loss, we need binary labels
-
-	# this is a similar generator, for validation data
-	validation_generator = test_datagen.flow_from_directory(
-	        './data/testLabeled/',
-	        target_size=(image_size, image_size),
-	        batch_size=batch_size,
-	        class_mode='binary')
-
 	for x in range(1,121):
 		print('training epoch:',x)
 		batch_size=calBatchSize(x)
 		model.fit_generator(
-		        train_generator,
+		        trainGenerator(image_size,batch_size),
 		        steps_per_epoch=25000 // batch_size,
 		        epochs=1,
-		        validation_data=validation_generator,
+		        validation_data=validationGenerator(image_size,batch_size),
 		        validation_steps=1000 // batch_size,
 		        verbose=1,
 		        max_queue_size=25)
-		loss,acc=model.evaluate_generator(validation_generator)
+		loss,acc=model.evaluate_generator(validationGenerator(image_size,batch_size))
 		model.save_weights('./weights/weights_'+str(round(acc,5))+'.h5')
 		model.save('./models/model_'+str(round(acc,5))+'.dnn') 
 
