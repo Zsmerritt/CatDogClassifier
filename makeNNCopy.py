@@ -77,7 +77,7 @@ def modelOld():
 
 def genModel():
 
-	image_size=200
+	image_size=300
 	dropout=0.2
 	kernel_size=(3,3)
 	pool_size=(2,2)
