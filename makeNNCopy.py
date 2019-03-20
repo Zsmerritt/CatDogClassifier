@@ -119,21 +119,11 @@ def genModel():
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 
-	#90% without following layers:
-	model.add(Conv2D(256, kernel_size=kernel_size, kernel_initializer=initializers.he_normal(seed=None)))
-	model.add(Activation('relu'))
-	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
-	model.add(MaxPooling2D(pool_size=pool_size))
-	model.add(Dropout(dropout))
-
-	model.add(Conv2D(256, kernel_size=kernel_size, kernel_initializer=initializers.he_normal(seed=None)))
-	model.add(Activation('relu'))
-	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
-	model.add(MaxPooling2D(pool_size=pool_size))
-	model.add(Dropout(dropout))
-	#end
-
 	model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
+
+	model.add(Dense(512, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
 
 	model.add(Dense(256, kernel_initializer=initializers.lecun_normal(seed=None)))
 	model.add(Activation('relu'))
