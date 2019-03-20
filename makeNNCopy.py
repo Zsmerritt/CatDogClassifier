@@ -75,7 +75,7 @@ def modelOld():
 	model.save_weights('first_try1.h5')
 	model.save('model1.dnn') 
 
-def genModel():
+def model_1():
 
 	image_size=300
 	dropout=0.2
@@ -119,6 +119,7 @@ def genModel():
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 
+	#begin additonal layers
 	model.add(Conv2D(256, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
@@ -126,6 +127,125 @@ def genModel():
 	model.add(Dropout(dropout))
 
 	model.add(Conv2D(256, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+	#end additional layers
+
+	model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
+
+	model.add(Dense(256, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(128, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(64, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(32, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(1))
+	model.add(Activation('sigmoid'))
+
+	model.compile(loss='binary_crossentropy',
+	              optimizer='rmsprop',
+	              metrics=['accuracy'])
+
+	batch_size = 16
+
+	# this is the augmentation configuration we will use for training
+	train_datagen = ImageDataGenerator(
+	        rescale=1./255,
+	        shear_range=0.2,
+	        zoom_range=0.2,
+	        horizontal_flip=True,
+	        rotation_range=40,
+	        width_shift_range=0.2,
+	        height_shift_range=0.2,
+	        fill_mode='nearest')
+
+	# this is the augmentation configuration we will use for testing:
+	# only rescaling
+	test_datagen = ImageDataGenerator(rescale=1./255)
+
+	# this is a generator that will read pictures found in
+	# subfolers of 'data/train', and indefinitely generate
+	# batches of augmented image data
+	train_generator = train_datagen.flow_from_directory(
+	        './data/train/',  # this is the target directory
+	        target_size=(image_size, image_size),  # all images will be resized to 150x150
+	        batch_size=batch_size,
+	        class_mode='binary')  # since we use binary_crossentropy loss, we need binary labels
+
+	# this is a similar generator, for validation data
+	validation_generator = test_datagen.flow_from_directory(
+	        './data/testLabeled/',
+	        target_size=(image_size, image_size),
+	        batch_size=batch_size,
+	        class_mode='binary')
+
+	for x in range(1,121):
+		print('training epoch:',x)
+		batch_size=calBatchSize(x)
+		model.fit_generator(
+		        train_generator,
+		        steps_per_epoch=25000 // batch_size,
+		        epochs=1,
+		        validation_data=validation_generator,
+		        validation_steps=1000 // batch_size,
+		        verbose=1,
+		        max_queue_size=25)
+		loss,acc=model.evaluate_generator(validation_generator)
+		model.save_weights('./weights/weights_'+str(round(acc,5))+'.h5')
+		model.save('./models/model_'+str(round(acc,5))+'.dnn') 
+
+def model_2():
+
+	image_size=200
+	#increased dropout from 0.2 to 0.4
+	dropout=0.4
+	kernel_size=(3,3)
+	pool_size=(2,2)
+
+	model = Sequential()
+	model.add(Conv2D(32, kernel_size=kernel_size, padding='same', input_shape=(image_size, image_size, 3), kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+
+	model.add(Conv2D(32, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+
+	model.add(Conv2D(64, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+
+	model.add(Conv2D(64, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+
+	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+
+	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
@@ -204,6 +324,141 @@ def genModel():
 		model.save_weights('./weights/weights_'+str(round(acc,5))+'.h5')
 		model.save('./models/model_'+str(round(acc,5))+'.dnn') 
 
+def model_3():
+
+	image_size=200
+	dropout=0.2
+	kernel_size=(3,3)
+	pool_size=(2,2)
+
+	model = Sequential()
+	model.add(Conv2D(32, kernel_size=kernel_size, padding='same', input_shape=(image_size, image_size, 3), kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+
+	model.add(Conv2D(32, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+
+	model.add(Conv2D(64, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+
+	model.add(Conv2D(64, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+
+	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+
+	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+
+	model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
+
+	#added extra dense layer between each dense layer
+	model.add(Dense(256, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(256, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(128, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(128, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(64, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(64, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(32, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(32, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(1))
+	model.add(Activation('sigmoid'))
+
+	model.compile(loss='binary_crossentropy',
+	              optimizer='rmsprop',
+	              metrics=['accuracy'])
+
+	batch_size = 16
+
+	# this is the augmentation configuration we will use for training
+	train_datagen = ImageDataGenerator(
+	        rescale=1./255,
+	        shear_range=0.2,
+	        zoom_range=0.2,
+	        horizontal_flip=True,
+	        rotation_range=40,
+	        width_shift_range=0.2,
+	        height_shift_range=0.2,
+	        fill_mode='nearest')
+
+	# this is the augmentation configuration we will use for testing:
+	# only rescaling
+	test_datagen = ImageDataGenerator(rescale=1./255)
+
+	# this is a generator that will read pictures found in
+	# subfolers of 'data/train', and indefinitely generate
+	# batches of augmented image data
+	train_generator = train_datagen.flow_from_directory(
+	        './data/train/',  # this is the target directory
+	        target_size=(image_size, image_size),  # all images will be resized to 150x150
+	        batch_size=batch_size,
+	        class_mode='binary')  # since we use binary_crossentropy loss, we need binary labels
+
+	# this is a similar generator, for validation data
+	validation_generator = test_datagen.flow_from_directory(
+	        './data/testLabeled/',
+	        target_size=(image_size, image_size),
+	        batch_size=batch_size,
+	        class_mode='binary')
+
+	for x in range(1,121):
+		print('training epoch:',x)
+		batch_size=calBatchSize(x)
+		model.fit_generator(
+		        train_generator,
+		        steps_per_epoch=25000 // batch_size,
+		        epochs=1,
+		        validation_data=validation_generator,
+		        validation_steps=1000 // batch_size,
+		        verbose=1,
+		        max_queue_size=25)
+		loss,acc=model.evaluate_generator(validation_generator)
+		model.save_weights('./weights/weights_'+str(round(acc,5))+'.h5')
+		model.save('./models/model_'+str(round(acc,5))+'.dnn') 
+
+
 
 def calBatchSize(epoch):
 	if epoch<=20:
@@ -221,7 +476,10 @@ def calBatchSize(epoch):
 
 
 def main():
-	genModel()
+	model_1()
+	model_2()
+	model_3()
+
 
 
 if __name__ == '__main__':
