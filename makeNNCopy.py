@@ -43,21 +43,31 @@ def trainAndSave(model,epochs,name,image_size,trainDataLen,validDataLen):
 	#hold on to best model to save after training
 	bestModel=model
 	bestModelLoss,bestModelAcc=1.0,0.0
+
+	#moved these out of loop to solve mem alocation prob
+	initBatchSize=16
+	trainGen=trainGenerator(image_size,initBatchSize)
+	validGen=validationGenerator(image_size,initBatchSize)
+
 	for x in range(1,epochs+1):
 		#print infor and adjust batch size
-		print('model: ',name,', training epoch:',x)
+		print('MODEL: ',name,' CURRENT EPOCH:',x)
 		batch_size=calBatchSize(x,epochs)
+		#update generators only when batch size changes
+		if batch_size!=initBatchSize:
+			trainGen=trainGenerator(image_size,batch_size)
+			validGen=validationGenerator(image_size,batch_size)
 		#fit model
 		model.fit_generator(
-		        trainGenerator(image_size,batch_size),
+		        trainGen,
 		        steps_per_epoch=trainDataLen // batch_size,
 		        epochs=1,
-		        validation_data=validationGenerator(image_size,batch_size),
+		        validation_data=validGen,
 		        validation_steps=validDataLen // batch_size,
 		        verbose=1,
-		        max_queue_size=25)
+		        max_queue_size=16)
 		#cal loss and accuracy before comparing to previous best model
-		loss,acc=model.evaluate_generator(validationGenerator(image_size,batch_size),steps=1)
+		loss,acc=model.evaluate_generator(validGen)
 		if bestModelAcc<acc and bestModelLoss>loss:
 			bestModel=deepcopy(model)
 			bestModelLoss,bestModelAcc=loss,acc
