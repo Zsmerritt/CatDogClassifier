@@ -45,7 +45,7 @@ def trainAndSave(model,epochs,name,image_size,trainDataLen,validDataLen):
 	bestModelLoss,bestModelAcc=1.0,0.0
 	for x in range(1,epochs+1):
 		#print infor and adjust batch size
-		print('model: 'name,', training epoch:',x)
+		print('model: ',name,', training epoch:',x)
 		batch_size=calBatchSize(x,epochs)
 		#fit model
 		model.fit_generator(
