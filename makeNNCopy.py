@@ -3,7 +3,6 @@ from keras.layers import Conv2D, MaxPooling2D, Activation, Dropout, Flatten, Den
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
 from keras import initializers
 from copy import deepcopy
-import keras.backend as K
 
 
 # this is the augmentation configuration we will use for training
@@ -56,6 +55,7 @@ def trainAndSave(model,epochs,name,image_size,trainDataLen,validDataLen):
 		batch_size=calBatchSize(x,epochs)
 		#update generators only when batch size changes
 		if batch_size!=initBatchSize:
+			initBatchSize=batch_size
 			trainGen=trainGenerator(image_size,batch_size)
 			validGen=validationGenerator(image_size,batch_size)
 		#fit model
