@@ -1,18 +1,7 @@
-from keras.layers import BatchNormalization, Layer
-from keras.initializers import Initializer
+from keras.layers import BatchNormalization, Layer, InputSpec
+from keras import initializers, regularizers, constraints
+from keras import backend as K
 from keras.backend.tensorflow_backend import tf, _regular_normalize_batch_in_training
-
-
-#custom initializers to force float32
-class Ones32(Initializer):
-    def __call__(self, shape, dtype=None):
-        return K.constant(1, shape=shape, dtype='float32')
-
-class Zeros32(Initializer):
-    def __call__(self, shape, dtype=None):
-        return K.constant(0, shape=shape, dtype='float32')
-    
-
 
 class BatchNormalizationF16(Layer):
 
@@ -38,8 +27,8 @@ class BatchNormalizationF16(Layer):
         self.epsilon = epsilon
         self.center = center
         self.scale = scale
-        self.beta_initializer = Initializer.get(beta_initializer)
-        self.gamma_initializer = Initializer.get(gamma_initializer)
+        self.beta_initializer = initializers.get(beta_initializer)
+        self.gamma_initializer = initializers.get(gamma_initializer)
         self.moving_mean_initializer = initializers.get(moving_mean_initializer)
         self.moving_variance_initializer = (
             initializers.get(moving_variance_initializer))
