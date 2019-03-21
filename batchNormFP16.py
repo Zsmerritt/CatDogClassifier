@@ -38,8 +38,8 @@ class BatchNormalizationF16(Layer):
         self.epsilon = epsilon
         self.center = center
         self.scale = scale
-        self.beta_initializer = Initializers.get(beta_initializer)
-        self.gamma_initializer = Initializers.get(gamma_initializer)
+        self.beta_initializer = Initializer.get(beta_initializer)
+        self.gamma_initializer = Initializer.get(gamma_initializer)
         self.moving_mean_initializer = initializers.get(moving_mean_initializer)
         self.moving_variance_initializer = (
             initializers.get(moving_variance_initializer))
