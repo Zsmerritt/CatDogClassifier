@@ -4,6 +4,7 @@ from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_a
 from keras import initializers
 from copy import deepcopy
 import keras.backend as K
+from batchNormFP16 import BatchNormalizationF16
 
 
 #adjust float size to lower mem requirements
@@ -147,7 +148,7 @@ def model_original():
 	model = Sequential()
 	model.add(Conv2D(32, kernel_size=kernel_size, padding='same', input_shape=(image_size, image_size, 3), kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
-	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(BatchNormalizationF16(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 
