@@ -1,3 +1,12 @@
+#updated memory allocation, hopfully fixes epoch 41 mem allocation
+import tensorflow as tf
+from keras.backend.tensorflow_backend import set_session
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+config.gpu_options.visible_device_list = "0"
+set_session(tf.Session(config=config))
+
+
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Activation, Dropout, Flatten, Dense, BatchNormalization
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
