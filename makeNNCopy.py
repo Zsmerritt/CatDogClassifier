@@ -12,6 +12,7 @@ from keras.layers import Conv2D, MaxPooling2D, Activation, Dropout, Flatten, Den
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
 from keras import initializers
 from copy import deepcopy
+import gc
 
 
 # this is the augmentation configuration we will use for training
@@ -64,9 +65,15 @@ def trainAndSave(model,epochs,name,image_size,trainDataLen,validDataLen):
 		batch_size=calBatchSize(x,epochs)
 		#update generators only when batch size changes
 		if batch_size!=initBatchSize:
+			trainGen=None
+			validGen=None
+			#garbage collector to run before new generator allocation to reduce memory usuage
+			gc.collect()
 			initBatchSize=batch_size
 			trainGen=trainGenerator(image_size,batch_size)
 			validGen=validationGenerator(image_size,batch_size)
+
+
 		#fit model
 		model.fit_generator(
 		        trainGen,
@@ -217,7 +224,7 @@ def model_original():
 	model.add(Activation('sigmoid'))
 
 	model.compile(loss='binary_crossentropy',
-	              optimizer='rmsprop',
+	              optimizer='adam',
 	              metrics=['accuracy'])
 
 	trainAndSave(model,epochs,name,image_size,25000,1000)
@@ -315,7 +322,7 @@ def model_1():
 	model.add(Activation('sigmoid'))
 
 	model.compile(loss='binary_crossentropy',
-	              optimizer='rmsprop',
+	              optimizer='adam',
 	              metrics=['accuracy'])
 
 	trainAndSave(model,epochs,name,image_size,25000,1000)
@@ -403,7 +410,7 @@ def model_2():
 	model.add(Activation('sigmoid'))
 
 	model.compile(loss='binary_crossentropy',
-	              optimizer='rmsprop',
+	              optimizer='adam',
 	              metrics=['accuracy'])
 
 	trainAndSave(model,epochs,name,image_size,25000,1000)
@@ -495,7 +502,7 @@ def model_3():
 	model.add(Activation('sigmoid'))
 
 	model.compile(loss='binary_crossentropy',
-	              optimizer='rmsprop',
+	              optimizer='adam',
 	              metrics=['accuracy'])
 
 	trainAndSave(model,epochs,name,image_size,25000,1000)
