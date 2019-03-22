@@ -502,16 +502,16 @@ def modelStart(modelName):
 
 
 def main():
-	while not modelStart(model1):
+	while not modelStart(model_original):
 		if input('Would you like to restart this model? (y or n) ')==n:
 			break
-	while not modelStart(model2):
+	while not modelStart(model_1):
 		if input('Would you like to restart this model? (y or n) ')==n:
 			break
-	while not modelStart(model3):
+	while not modelStart(model_2):
 		if input('Would you like to restart this model? (y or n) ')==n:
 			break
-	while not modelStart(model4):
+	while not modelStart(model_3):
 		if input('Would you like to restart this model? (y or n) ')==n:
 			break
 
