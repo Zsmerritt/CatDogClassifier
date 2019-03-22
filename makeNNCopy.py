@@ -491,12 +491,30 @@ def model_3():
 
 	trainAndSave(model,epochs,name,image_size,25000,1000)
 
+#method allows for restarting models which are trainging poorly
+def modelStart(modelName):
+	try:
+		modelName()
+		return True
+	except KeyboardInterrupt as e:
+		print('KeyboardInterrupt detected, ending training')
+		return False
+
 
 def main():
-	model_original()
-	model_1()
-	model_2()
-	model_3()
+	while not modelStart(model1):
+		if input('Would you like to restart this model? (y or n) ')==n:
+			break
+	while not modelStart(model2):
+		if input('Would you like to restart this model? (y or n) ')==n:
+			break
+	while not modelStart(model3):
+		if input('Would you like to restart this model? (y or n) ')==n:
+			break
+	while not modelStart(model4):
+		if input('Would you like to restart this model? (y or n) ')==n:
+			break
+
 
 
 
