@@ -153,54 +153,79 @@ def model_original():
 	epochs=120
 	name='og'
 
+	#receptive field size = prevLayerRCF + (K-1) * jumpSize
+	#featOut = ceil((featIn + 2*padding - K)/strideLen)+1
+	#jumpOut = (featInit-featOut)/featOut-1  OR  stride*JumpIn
+
 	model = Sequential()
 	model.add(Conv2D(32, kernel_size=kernel_size, padding='same', input_shape=(image_size, image_size, 3), kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
+	#receptive field size = 1 + (3-1) * 1 = 3
+	#real Filter size = 3
+	#c = 1
 
 	model.add(Conv2D(32, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
+	#RFS = 3 + 2 * 1 = 5
+	#FilterSize = 3
+	#c = 3 / 5 = 0.6
 
 	model.add(Conv2D(64, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
+	#RFS = 5+2=7
+	#c = 3 / 7 = 0.42
 
 	model.add(Conv2D(64, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
+	#RFS= 9
+	#c = 3 / 9 = 0.33
 
 	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
+	#RFS = 11
+	#c = 3/11 = 0.2727
 
 	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
+	#RFS = 13
+	#c = 3/13 = 0.23
 
 	model.add(Conv2D(256, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
+	#RFS = 15
+	#c = 3/15 = 0.2
 
 	model.add(Conv2D(256, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
+	#RFS = 17
+	#c = 3/17 = 0.17 
+	#this is perfect, it should get as close to 1/6 = 0.16 without going below
+	#it might be worth putting in a stride len > 1, which would increase Receptive Field Size, and therefore allow the model to see more of the big picture
+	#this may also mean removing some of the deeper convolutional layers. This could be rectified by increasing kernal size
 
 	model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
 
@@ -219,6 +244,8 @@ def model_original():
 	model.add(Dense(32, kernel_initializer=initializers.lecun_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(Dropout(dropout))
+
+	#it might be good to try freezing all convolution layers or all layers except last 32 Dense and training that specific layer to be more accurate.
 
 	model.add(Dense(1))
 	model.add(Activation('sigmoid'))
@@ -288,6 +315,8 @@ def model_1():
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 
+
+	#these layers go beyond the maximum C threshold. Therefore performance should drop for this model. 
 	model.add(Conv2D(512, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
