@@ -246,7 +246,7 @@ def image_processor(transform_map, target_size,image_multiplier=1,save_test_imag
 		output = 0 if output[0]=="c" else 1
 		for x in range(image_multiplier):
 
-			trans_image=random_transform(np.asarray(image),transform_map)
+			trans_image=random_transform(np.asarray(image,dtype=np.int8),transform_map)
 
 			batch_input += [trans_image]
 			batch_output += [output]
@@ -256,12 +256,10 @@ def image_processor(transform_map, target_size,image_multiplier=1,save_test_imag
 				(array_to_img(trans_image)).save(save_test_directory+image_name+'--'+str(x), 'JPEG')
 
 		image.close()
-	print(batch_input)
 	# Return a tuple of (input,output) to feed the network
-	batch_x = np.asarray( batch_input )
-	batch_y = np.asarray( batch_output )
-	print(batch_x.shape)
-	print(batch_y.shape)
+	batch_x = np.asarray(batch_input,dtype=np.int8)
+	batch_y = np.asarray(batch_output,dtype=np.int8)
+
 	
 	return {'data':batch_x, 'labels':batch_y}
 
