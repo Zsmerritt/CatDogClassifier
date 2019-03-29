@@ -201,7 +201,8 @@ def get_transform_map(
 
 	
 def image_generator(transform_map, batch_size, target_size):
-	image_paths = glob.glob(pathname=transform_map['data_folder']+'/**/*.tif', recursive=True)
+	image_paths = glob.glob(pathname=transform_map['data_folder']+'/**/*.jpg', recursive=True)
+	print(image_paths)
 	while True:
 		# Select files (paths/indices) for the batch
 		batch_paths = np.random.choice(a = image_paths, 
@@ -233,7 +234,7 @@ def image_generator(transform_map, batch_size, target_size):
 
 
 def image_processor(transform_map, target_size,image_multiplier=1,save_test_images=False,save_test_directory='./data/testImages'):
-	image_paths = glob.glob(pathname=transform_map['data_folder']+'/**/*.tif', recursive=True)
+	image_paths = glob.glob(pathname=transform_map['data_folder']+'/**/*.jpg', recursive=True)
 	# Select files (paths/indices) for the batch
 	batch_input = []
 	batch_output = [] 

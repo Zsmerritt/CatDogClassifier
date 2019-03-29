@@ -17,7 +17,7 @@ import dataGen
 
 
 train_transform_map = dataGen.get_transform_map(
-	data_folder='./data/testLabeled/',
+	data_folder='./data/train/',
     rescale=1./255,
     shear_range=0.2,
     zoom_range=0.2,
@@ -27,7 +27,7 @@ train_transform_map = dataGen.get_transform_map(
     height_shift_range=0.2,
     fill_mode='nearest')
 
-valid_transform_map = dataGen.get_transform_map(data_folder='./data/train/', rescale=1./255)
+valid_transform_map = dataGen.get_transform_map(data_folder='./data/testLabeled/', rescale=1./255)
 
 target_size=(400,400)
 
