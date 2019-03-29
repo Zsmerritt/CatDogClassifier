@@ -243,7 +243,7 @@ def image_processor(transform_map, target_size,image_multiplier=1,save_test_imag
 		image=pil_image.open(image_path)
 		image.thumbnail(target_size)
 		output=image_path.split('/')[-2]
-		output = 0 if output[0]=="n" else 1
+		output = 0 if output[0]=="c" else 1
 		for x in range(image_multiplier):
 
 			trans_image=random_transform(np.asarray(image),transform_map)

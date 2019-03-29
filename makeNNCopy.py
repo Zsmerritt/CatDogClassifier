@@ -13,24 +13,30 @@ from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_a
 from keras import initializers
 from copy import deepcopy
 import gc
+import dataGen
 
 
-# this is the augmentation configuration we will use for training
-train_datagen = ImageDataGenerator(
-        rescale=1./255,
-        shear_range=0.2,
-        zoom_range=0.2,
-        horizontal_flip=True,
-        rotation_range=40,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        fill_mode='nearest')
+train_transform_map = dataGen.get_transform_map(
+	data_folder='./data/testLabeled/',
+    rescale=1./255,
+    shear_range=0.2,
+    zoom_range=0.2,
+    horizontal_flip=True,
+    rotation_range=40,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    fill_mode='nearest')
 
+test_transform_map = dataGen.get_transform_map(dataFolder='./data/train/', rescale=1./255)
 
-# this is the augmentation configuration we will use for testing:
-# only rescaling
-test_datagen = ImageDataGenerator(rescale=1./255)
+target_size=(400,400)
 
+print('generating data')
+train=dataGen.image_processor(transform_map=train_transform_map,target_size=target_size,image_multiplier=2)
+valid=dataGen.image_processor(transform_map=valid_transform_map,target_size=target_size)
+print('finished processing data')
+
+'''
 # this is a generator that will read pictures found in
 # subfolers of 'data/train', and indefinitely generate
 # batches of augmented image data
@@ -48,8 +54,13 @@ def validationGenerator(size, batch):
         target_size=(size, size),
         batch_size=batch,
         class_mode='binary')
+'''
 
-def trainAndSave(model,epochs,name,image_size,trainDataLen,validDataLen):
+def shuffleData(data_dict):
+	perm=np.random.permutation(data_dict['data'].shape[0])
+	data_dict['data'],data_dict['labels']=data_dict['data'][perm],data_dict['labels'][perm]
+
+def trainAndSaveGenerator(model,epochs,name,image_size,trainDataLen,validDataLen):
 	#hold on to best model to save after training
 	bestModel=model
 	bestModelLoss,bestModelAcc=1.0,0.0
@@ -91,6 +102,43 @@ def trainAndSave(model,epochs,name,image_size,trainDataLen,validDataLen):
 	#save best model created
 	bestModel.save_weights('./weights/weights_'+name+'_'+str(round(bestModelAcc,5))+'.h5')
 	bestModel.save('./models/model_'+name+'_'+str(round(bestModelAcc,5))+'.dnn') 
+
+
+def trainAndSave(model,epochs,name):
+	#hold on to best model to save after training
+	bestModel=model
+	bestModelLoss,bestModelAcc=1.0,0.0
+
+	try:
+		for x in range(0,epochs):
+			#shuffle data to normalize
+			shuffleData(train)
+			#update batch_size 
+			batch_size=calBatchSize(x+1,epochs)
+			#print info and start epoch
+			print('MODEL: '+str(name)+'  CURRENT EPOCH: '+str(x+1)+"/"+str(epochs)+'  BATCH SIZE: '+str(batch_size))
+			hist=model.fit(
+			        x=train['data'],
+			        y=train['labels'],
+			        batch_size=batch_size,
+			        epochs=1,
+			        verbose=1,
+			        validation_data=(valid['data'],valid['labels']))
+
+			#cal loss and accuracy before comparing to previous best model
+			acc,loss=hist.history['val_acc'][0],hist.history['val_loss'][0]
+			if bestModelAcc<acc and bestModelLoss>loss:
+				bestModel=deepcopy(model)
+				bestModelLoss,bestModelAcc=loss,acc
+		#save best model created
+		bestModel.save_weights('./weights/weights_'+name+'_'+str(round(bestModelAcc,5))+'.h5')
+		bestModel.save('./models/model_'+name+'_'+str(round(bestModelAcc,5))+'.dnn') 
+	except KeyboardInterrupt as e:
+		print('Saving best model generated so far')
+		bestModel.save_weights('./weights/weights_'+name+'_'+str(round(bestModelAcc,5))+'.h5')
+		bestModel.save('./models/model_'+name+'_'+str(round(bestModelAcc,5))+'.dnn') 
+		raise KeyboardInterrupt
+
 
 
 def calBatchSize(epoch, totalEpochs):
