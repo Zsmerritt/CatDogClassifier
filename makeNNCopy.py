@@ -27,7 +27,7 @@ train_transform_map = dataGen.get_transform_map(
     height_shift_range=0.2,
     fill_mode='nearest')
 
-test_transform_map = dataGen.get_transform_map(dataFolder='./data/train/', rescale=1./255)
+test_transform_map = dataGen.get_transform_map(data_folder='./data/train/', rescale=1./255)
 
 target_size=(400,400)
 
