@@ -197,7 +197,7 @@ def model_original():
 	dropout=0.2
 	kernel_size=(3,3)
 	pool_size=(2,2)
-	image_size=300
+	image_size=400
 	epochs=120
 	name='og'
 
@@ -408,7 +408,7 @@ def model_1():
 #increased Dropout rate (ineffective with dropout of .4, lowering to .3)
 def model_2():
 
-	image_size=300
+	image_size=400
 	#increased dropout from 0.2 to 0.3
 	dropout=0.3
 	kernel_size=(3,3)
@@ -496,7 +496,7 @@ def model_2():
 #added another fully connected dense layer
 def model_3():
 
-	image_size=300
+	image_size=400
 	dropout=0.2
 	kernel_size=(3,3)
 	pool_size=(2,2)
