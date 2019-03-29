@@ -188,7 +188,7 @@ def modelOld():
 	              optimizer='rmsprop',
 	              metrics=['accuracy'])
 
-	trainAndSave(model,epochs,name,image_size,25000,1000)
+	trainAndSave(model,epochs,name)
 
 
 #~95%
@@ -302,7 +302,7 @@ def model_original():
 	              optimizer='adam',
 	              metrics=['accuracy'])
 
-	trainAndSave(model,epochs,name,image_size,25000,1000)
+	trainAndSave(model,epochs,name)
 
 #added in two additional conv layers
 def model_1():
@@ -402,7 +402,7 @@ def model_1():
 	              optimizer='adam',
 	              metrics=['accuracy'])
 
-	trainAndSave(model,epochs,name,image_size,25000,1000)
+	trainAndSave(model,epochs,name)
 
 
 #increased Dropout rate (ineffective with dropout of .4, lowering to .3)
@@ -490,7 +490,7 @@ def model_2():
 	              optimizer='adam',
 	              metrics=['accuracy'])
 
-	trainAndSave(model,epochs,name,image_size,25000,1000)
+	trainAndSave(model,epochs,name)
 
 
 #added another fully connected dense layer
@@ -582,7 +582,7 @@ def model_3():
 	              optimizer='adam',
 	              metrics=['accuracy'])
 
-	trainAndSave(model,epochs,name,image_size,25000,1000)
+	trainAndSave(model,epochs,name)
 
 #method allows for restarting models which are trainging poorly
 def modelStart(modelName):
