@@ -14,7 +14,7 @@ from keras import initializers
 from copy import deepcopy
 import gc
 import dataGen
-
+from tqdm import tqdm
 
 train_transform_map = dataGen.get_transform_map(
 	data_folder='./data/train/',
@@ -116,11 +116,9 @@ def trainAndSave(model,epochs,name):
 			#update batch_size 
 			batch_size=calBatchSize(x+1,epochs)
 			steps_per_epoch_train=25000//batch_size
-			steps_per_epoch_valid=1000//batch_size
-			#print info and start epoch
-			print('MODEL: '+str(name)+'  CURRENT EPOCH: '+str(x+1)+"/"+str(epochs)+'  BATCH SIZE: '+str(batch_size))
+			epoch_desc='MODEL: '+str(name)+'  CURRENT EPOCH: '+str(x+1)+"/"+str(epochs)+'  BATCH SIZE: '+str(batch_size)
+			for y in tqdm(range(0,steps_per_epoch_train), desc=epoch_desc):
 
-			for y in range(0,steps_per_epoch_train):
 				train=dataGen.image_processor_batch(transform_map=train_transform_map,target_size=target_size,batch_size=batch_size)
 				model.train_on_batch(
 			        x=train['data'],
