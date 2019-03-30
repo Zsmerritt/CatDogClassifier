@@ -131,13 +131,12 @@ def trainAndSave(model,epochs,name,target_size):
 							batch_size=batch_size,
 							verbose=1)
 							#['val_acc'][0],hist.history['val_loss'][0]
-
-			print("Model Validation Accuracy: ",acc,"Model Validation Loss",loss)
-			if bestModelAcc<acc and bestModelLoss>loss:
-				bestModel=deepcopy(model)
-				bestModelLoss,bestModelAcc=loss,acc
 			'''
-			print(test_model_accuracy(model,valid['data'],valid['labels'],target_size,batch_size))
+			acc=test_model_accuracy(model,valid['data'],valid['labels'],target_size,batch_size)
+			print("Model Validation Accuracy: ",acc)
+			if bestModelAcc<acc:
+				bestModel=deepcopy(model)
+				bestModelAcc=acc
 		#save best model created
 		bestModel.save_weights('./weights/weights_'+name+'_'+str(round(bestModelAcc,5))+'.h5')
 		bestModel.save('./models/model_'+name+'_'+str(round(bestModelAcc,5))+'.dnn') 
