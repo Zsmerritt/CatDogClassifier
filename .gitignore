@@ -3,3 +3,4 @@
 *.dnn
 *.mlmodel
 *.zip
+./__pycache__/
