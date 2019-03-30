@@ -29,15 +29,13 @@ train_transform_map = dataGen.get_transform_map(
 
 valid_transform_map = dataGen.get_transform_map(data_folder='./data/testLabeled/', rescale=1./255)
 
-target_size=(400,400)
-
-
-print('generating validation data')
-#train=dataGen.image_processor(transform_map=train_transform_map,target_size=target_size,image_multiplier=2)
-valid=dataGen.image_processor(transform_map=valid_transform_map,target_size=target_size)
-print('finished processing data')
 
 '''
+print('generating validation data')
+#train=dataGen.image_processor(transform_map=train_transform_map,target_size=target_size,image_multiplier=2)
+print('finished processing data')
+
+
 # this is a generator that will read pictures found in
 # subfolers of 'data/train', and indefinitely generate
 # batches of augmented image data
@@ -106,10 +104,12 @@ def trainAndSaveGenerator(model,epochs,name,image_size,trainDataLen,validDataLen
 
 
 #trains on batch
-def trainAndSave(model,epochs,name):
+def trainAndSave(model,epochs,name,target_size):
 	#hold on to best model to save after training
 	bestModel=model
 	bestModelLoss,bestModelAcc=1.0,0.0
+
+	valid=dataGen.image_processor(transform_map=valid_transform_map,target_size=target_size)
 
 	try:
 		for x in range(0,epochs):
@@ -202,7 +202,7 @@ def model_original():
 	dropout=0.2
 	kernel_size=(3,3)
 	pool_size=(2,2)
-	image_size=400
+	image_size=300
 	epochs=120
 	name='og'
 
@@ -307,80 +307,85 @@ def model_original():
 	              optimizer='adam',
 	              metrics=['accuracy'])
 
-	trainAndSave(model,epochs,name)
+	trainAndSave(model,epochs,name,target_size=(image_size,image_size))
 
 #added in two additional conv layers
 def model_1():
 
-	image_size=400
+	image_size=256
 	dropout=0.2
 	kernel_size=(3,3)
 	pool_size=(2,2)
 	name='model1'
 	epochs=120
+	stride=(2,2)
+
+	#receptive field size = prevLayerRCF + (K-1) * jumpSize
+	#featOut = ceil((featIn + 2*padding - K)/strideLen)+1
+	#jumpOut = (featInit-featOut)/featOut-1  OR  stride*JumpIn
 
 	model = Sequential()
-	model.add(Conv2D(32, kernel_size=kernel_size, padding='same', input_shape=(image_size, image_size, 3), kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Conv2D(32, kernel_size=kernel_size, padding='same', stride=stride, input_shape=(image_size, image_size, 3), kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	#model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+	#RFS= 1 + 2*1= 3
+	#c=3/3=1
+
+	model.add(Conv2D(32, kernel_size=kernel_size, padding='same', stride=stride, kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
+	#RFS= 3+2^2 = 7
+	#c=3/7
 
-	model.add(Conv2D(32, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Conv2D(64, kernel_size=kernel_size, padding='same', stride=stride, kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	#model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+	#RFS= 7 + 2^3=15
+	#c=3/15=0.2
+
+	model.add(Conv2D(64, kernel_size=kernel_size, padding='same', stride=stride, kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
+	#RFS = 15 + 2^4=31
 
-	model.add(Conv2D(64, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', stride=stride, kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	#model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+	#RFS = 31 +2^5=63
+
+	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', stride=stride, kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
+	#RFS = 63 + 2^6 = 127
 
-	model.add(Conv2D(64, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Conv2D(256, kernel_size=kernel_size, padding='same', stride=stride, kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
+	#RFS = 127 + 2^7 = 255
 
-	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	'''
+	model.add(Conv2D(256, kernel_size=kernel_size, padding='same', stride=stride, kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
+	#RFS = 255 + 2^8 = 511
+	'''
 
-	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
-	model.add(Activation('relu'))
-	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
-	model.add(MaxPooling2D(pool_size=pool_size))
-	model.add(Dropout(dropout))
-
-	model.add(Conv2D(256, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
-	model.add(Activation('relu'))
-	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
-	model.add(MaxPooling2D(pool_size=pool_size))
-	model.add(Dropout(dropout))
-
-	model.add(Conv2D(256, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
-	model.add(Activation('relu'))
-	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
-	model.add(MaxPooling2D(pool_size=pool_size))
-	model.add(Dropout(dropout))
-
-
-	#these layers go beyond the maximum C threshold. Therefore performance should drop for this model. 
-	model.add(Conv2D(512, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
-	model.add(Activation('relu'))
-	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
-	model.add(MaxPooling2D(pool_size=pool_size))
-	model.add(Dropout(dropout))
-
-	model.add(Conv2D(512, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
-	model.add(Activation('relu'))
-	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
-	model.add(MaxPooling2D(pool_size=pool_size))
-	model.add(Dropout(dropout))
 
 	model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
 
@@ -407,7 +412,7 @@ def model_1():
 	              optimizer='adam',
 	              metrics=['accuracy'])
 
-	trainAndSave(model,epochs,name)
+	trainAndSave(model,epochs,name,target_size=(image_size,image_size))
 
 
 #increased Dropout rate (ineffective with dropout of .4, lowering to .3)
@@ -603,15 +608,18 @@ def main():
 	while not modelStart(model_original):
 		if input('Would you like to restart this model? (y or n) ')==n:
 			break
+	
 	while not modelStart(model_1):
 		if input('Would you like to restart this model? (y or n) ')==n:
 			break
+	'''
 	while not modelStart(model_2):
 		if input('Would you like to restart this model? (y or n) ')==n:
 			break
 	while not modelStart(model_3):
 		if input('Would you like to restart this model? (y or n) ')==n:
 			break
+	'''
 
 
 
