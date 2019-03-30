@@ -131,8 +131,7 @@ def trainAndSave(model,epochs,name):
 							x=valid['data'],
 							y=valid['labels'],
 							batch_size=batch_size,
-							verbose=1,
-							steps=steps_per_epoch_valid)
+							verbose=1)
 							#['val_acc'][0],hist.history['val_loss'][0]
 			print("Model Validation Accuracy: ",acc,"Model Validation Loss",loss)
 			if bestModelAcc<acc and bestModelLoss>loss:
