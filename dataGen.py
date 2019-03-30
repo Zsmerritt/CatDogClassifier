@@ -205,7 +205,6 @@ def get_transform_map(
 	
 def image_generator(transform_map, batch_size, target_size):
 	image_paths = glob.glob(pathname=transform_map['data_folder']+'/**/*.jpg', recursive=True)
-	print(image_paths)
 	while True:
 		# Select files (paths/indices) for the batch
 		batch_paths = np.random.choice(a = image_paths, 
@@ -263,6 +262,29 @@ def image_processor(transform_map, target_size,image_multiplier=1,save_test_imag
 	
 	return {'data':batch_x, 'labels':batch_y}
 
+def image_processor_batch(transform_map, target_size, batch_size):
+	#load file paths
+	image_paths = glob.glob(pathname=transform_map['data_folder']+'/**/*.jpg', recursive=True)
+	# Select files (paths/indices) for the batch
+	batch_paths = np.random.choice(a = image_paths, size = batch_size)
+	#lists to store data and labels
+	batch_input = []
+	batch_output = []
+	#load the image, parse as nparray and transform, the close
+	for path in batch_paths:
+		image=load_img(path,target_size=target_size)
+		trans_image=random_transform(np.asarray(image),transform_map)
+		image.close()
+		#get label and add to list
+		output=image_path.split('/')[-2]
+		output = 0 if output[0]=="c" else 1
+		batch_input += [trans_image]
+		batch_output += [output]
+	# Return a tuple of (input,output) to feed the network
+	batch_x = np.asarray(batch_input)
+	batch_y = np.asarray(batch_output)
+	return {'data':batch_x, 'labels':batch_y}
+	
 
 
 def get_random_transform(transform_map, img_shape, seed=None):

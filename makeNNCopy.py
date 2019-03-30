@@ -31,8 +31,9 @@ valid_transform_map = dataGen.get_transform_map(data_folder='./data/testLabeled/
 
 target_size=(400,400)
 
-print('generating data')
-train=dataGen.image_processor(transform_map=train_transform_map,target_size=target_size,image_multiplier=2)
+
+print('generating validation data')
+#train=dataGen.image_processor(transform_map=train_transform_map,target_size=target_size,image_multiplier=2)
 valid=dataGen.image_processor(transform_map=valid_transform_map,target_size=target_size)
 print('finished processing data')
 
@@ -104,6 +105,7 @@ def trainAndSaveGenerator(model,epochs,name,image_size,trainDataLen,validDataLen
 	bestModel.save('./models/model_'+name+'_'+str(round(bestModelAcc,5))+'.dnn') 
 
 
+#trains on batch
 def trainAndSave(model,epochs,name):
 	#hold on to best model to save after training
 	bestModel=model
@@ -111,22 +113,27 @@ def trainAndSave(model,epochs,name):
 
 	try:
 		for x in range(0,epochs):
-			#shuffle data to normalize
-			shuffleData(train)
 			#update batch_size 
 			batch_size=calBatchSize(x+1,epochs)
+			steps_per_epoch_train=25000//batch_size
+			steps_per_epoch_valid=1000//batch_size
 			#print info and start epoch
 			print('MODEL: '+str(name)+'  CURRENT EPOCH: '+str(x+1)+"/"+str(epochs)+'  BATCH SIZE: '+str(batch_size))
-			hist=model.fit(
+
+			for y in range(0,steps_per_epoch_train):
+				train=dataGen.image_processor_batch(transform_map=train_transform_map,target_size=target_size,batch_size=batch_size)
+				model.train_on_batch(
 			        x=train['data'],
-			        y=train['labels'],
-			        batch_size=batch_size,
-			        epochs=1,
-			        verbose=1,
-			        validation_data=(valid['data'],valid['labels']))
+			        y=train['labels'])
 
 			#cal loss and accuracy before comparing to previous best model
-			acc,loss=hist.history['val_acc'][0],hist.history['val_loss'][0]
+			loss, acc =evaluate(
+							x=valid['data'],
+							y=valid['labels'],
+							batch_size=batch_size,
+							verbose=1,
+							steps=steps_per_epoch_valid)
+							#['val_acc'][0],hist.history['val_loss'][0]
 			if bestModelAcc<acc and bestModelLoss>loss:
 				bestModel=deepcopy(model)
 				bestModelLoss,bestModelAcc=loss,acc
