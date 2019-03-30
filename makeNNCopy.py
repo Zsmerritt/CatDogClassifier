@@ -127,13 +127,14 @@ def trainAndSave(model,epochs,name):
 			        y=train['labels'])
 
 			#cal loss and accuracy before comparing to previous best model
-			loss, acc =evaluate(
+			loss, acc = model.evaluate(
 							x=valid['data'],
 							y=valid['labels'],
 							batch_size=batch_size,
 							verbose=1,
 							steps=steps_per_epoch_valid)
 							#['val_acc'][0],hist.history['val_loss'][0]
+			print("Model Validation Accuracy: ",acc,"Model Validation Loss",loss)
 			if bestModelAcc<acc and bestModelLoss>loss:
 				bestModel=deepcopy(model)
 				bestModelLoss,bestModelAcc=loss,acc
