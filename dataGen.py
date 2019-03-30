@@ -264,7 +264,7 @@ def image_processor(transform_map, target_size,image_multiplier=1,save_test_imag
 
 def image_processor_batch(transform_map, target_size, batch_size):
 	#load file paths
-	image_paths = glob.glob(pathname=transform_map['data_folder']+'/**/*.jpg', recursive=True)
+	result = [os.path.join(dp, f) for dp, dn, filenames in os.walk(transform_map['data_folder']) for f in filenames if os.path.splitext(f)[1] == '.jpg']
 	# Select files (paths/indices) for the batch
 	batch_paths = np.random.choice(a = image_paths, size = batch_size)
 	#lists to store data and labels
