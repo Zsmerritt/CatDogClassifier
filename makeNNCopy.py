@@ -109,15 +109,14 @@ def trainAndSave(model,epochs,name,target_size):
 	bestModel=model
 	bestModelLoss,bestModelAcc=1.0,0.0
 
-	valid=dataGen.image_processor(transform_map=valid_transform_map,target_size=target_size)
 
 	try:
 		for x in range(0,epochs):
 			#update batch_size 
 			batch_size=calBatchSize(x+1,epochs)
-			steps_per_epoch_train=25000//batch_size
+			steps_per_epoch_train=1#25000//batch_size
 			epoch_desc='MODEL: '+str(name)+'  CURRENT EPOCH: '+str(x+1)+"/"+str(epochs)+'  BATCH SIZE: '+str(batch_size)
-			for y in tqdm(range(0,steps_per_epoch_train), desc=epoch_desc):
+			for y in tqdm(range(steps_per_epoch_train), desc=epoch_desc):
 
 				train=dataGen.image_processor_batch(transform_map=train_transform_map,target_size=target_size,batch_size=batch_size)
 				model.train_on_batch(
@@ -132,7 +131,7 @@ def trainAndSave(model,epochs,name,target_size):
 							verbose=1)
 							#['val_acc'][0],hist.history['val_loss'][0]
 			'''
-			acc=test_model_accuracy(model,valid['data'],valid['labels'],target_size,batch_size)
+			acc=test_model_accuracy(model=model,transform_map=valid_transform_map,target_size=target_size,batch_size=batch_size)
 			print("Model Validation Accuracy: ",acc)
 			if bestModelAcc<acc:
 				bestModel=deepcopy(model)
@@ -146,11 +145,13 @@ def trainAndSave(model,epochs,name,target_size):
 		bestModel.save('./models/model_'+name+'_'+str(round(bestModelAcc,5))+'.dnn') 
 		raise KeyboardInterrupt
 
-def test_model_accuracy(model, valid_data, valid_labels,target_size,batch_size):
+def test_model_accuracy(model,transform_map,target_size,batch_size):
 	correct=0
-	for x, datum in tqdm(enumerate(valid_data.reshape((len(valid_data), 1, target_size[0], target_size[1], 3))),desc='Evaluating model'):
-		if model.predict(datum) == valid_labels[x]:correct+=1
-	return correct/len(valid_data)
+	for x in tqdm(range(999),desc='Evaluating Model'):
+		valid=dataGen.image_processor_batch(transform_map=transform_map,target_size=target_size,batch_size=1)
+		prediction=round(model.predict(valid['data'].reshape(1, target_size[0], target_size[1], 3))[0][0])
+		if prediction== valid['labels'][0]:correct+=1
+	return correct/999
 
 
 
