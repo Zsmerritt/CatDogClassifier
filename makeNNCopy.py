@@ -123,18 +123,21 @@ def trainAndSave(model,epochs,name,target_size):
 				model.train_on_batch(
 			        x=train['data'],
 			        y=train['labels'])
-
+			'''
 			#cal loss and accuracy before comparing to previous best model
-			loss, acc = model.evaluate(
+			acc = model.evaluate(
 							x=valid['data'],
 							y=valid['labels'],
 							batch_size=batch_size,
 							verbose=1)
 							#['val_acc'][0],hist.history['val_loss'][0]
+
 			print("Model Validation Accuracy: ",acc,"Model Validation Loss",loss)
 			if bestModelAcc<acc and bestModelLoss>loss:
 				bestModel=deepcopy(model)
 				bestModelLoss,bestModelAcc=loss,acc
+			'''
+			print(test_model_accuracy(model,valid['data'],valid['labels'],target_size,batch_size))
 		#save best model created
 		bestModel.save_weights('./weights/weights_'+name+'_'+str(round(bestModelAcc,5))+'.h5')
 		bestModel.save('./models/model_'+name+'_'+str(round(bestModelAcc,5))+'.dnn') 
@@ -144,21 +147,27 @@ def trainAndSave(model,epochs,name,target_size):
 		bestModel.save('./models/model_'+name+'_'+str(round(bestModelAcc,5))+'.dnn') 
 		raise KeyboardInterrupt
 
+def test_model_accuracy(model, valid_data, valid_labels,target_size,batch_size):
+	correct=0
+	for x, datum in tqdm(enumerate(valid_data.reshape((len(valid_data), 1, target_size[0], target_size[1], 3))),desc='Evaluating model'):
+		if model.predict(datum) == valid_labels[x]:correct+=1
+	return correct/len(valid_data)
+
 
 
 def calBatchSize(epoch, totalEpochs):
 	if epoch<=totalEpochs//6:
-		return 16
-	elif epoch<=(totalEpochs//6)*2:
 		return 32
-	elif epoch<=(totalEpochs//6)*3:
+	elif epoch<=(totalEpochs//6)*2:
 		return 64
-	elif epoch<=(totalEpochs//6)*4:
+	elif epoch<=(totalEpochs//6)*3:
 		return 128
-	elif epoch <=(totalEpochs//6)*5:
+	elif epoch<=(totalEpochs//6)*4:
 		return 256
-	else:
+	elif epoch <=(totalEpochs//6)*5:
 		return 512
+	else:
+		return 1024
 
 def modelOld():
 
