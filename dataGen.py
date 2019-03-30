@@ -278,6 +278,7 @@ def image_processor_batch(transform_map, target_size, batch_size):
 		#get label and add to list
 		output=path.split('/')[-2]
 		output = 0 if output[0]=="c" else 1
+		print(output)
 		batch_input += [trans_image]
 		batch_output += [output]
 	# Return a tuple of (input,output) to feed the network
