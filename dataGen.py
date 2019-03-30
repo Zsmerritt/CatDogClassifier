@@ -276,7 +276,7 @@ def image_processor_batch(transform_map, target_size, batch_size):
 		trans_image=random_transform(np.asarray(image),transform_map)
 		image.close()
 		#get label and add to list
-		output=image_path.split('/')[-2]
+		output=path.split('/')[-2]
 		output = 0 if output[0]=="c" else 1
 		batch_input += [trans_image]
 		batch_output += [output]
