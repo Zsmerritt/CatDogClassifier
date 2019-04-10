@@ -35,7 +35,7 @@ print('generating validation data')
 #train=dataGen.image_processor(transform_map=train_transform_map,target_size=target_size,image_multiplier=2)
 print('finished processing data')
 
-
+'''
 # this is a generator that will read pictures found in
 # subfolers of 'data/train', and indefinitely generate
 # batches of augmented image data
@@ -53,7 +53,6 @@ def validationGenerator(size, batch):
         target_size=(size, size),
         batch_size=batch,
         class_mode='binary')
-'''
 
 def shuffleData(data_dict):
 	perm=np.random.permutation(data_dict['data'].shape[0])
