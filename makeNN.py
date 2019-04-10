@@ -1,169 +1,189 @@
 import numpy as np, os, keras, glob, sys
 from PIL import Image
+from keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
+import numpy as np
+from keras.models import Sequential
+from keras.layers import Conv2D, MaxPooling2D, Activation, Dropout, Flatten, Dense, BatchNormalization
+from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
+from keras import initializers
 
-def makeNetwork():
+train_datagen = ImageDataGenerator(
+		rescale=1./255,
+		horizontal_flip=True,
+		vertical_flip=True,
+		fill_mode='nearest',
+		brightness_range=(0.0,1.5),
+		shear_range=0.2,
+    	zoom_range=0.2)
 
-	poolSize=(2,2)
-	dropout=0.3
+test_datagen = ImageDataGenerator(rescale=1./255)
 
-	model=keras.models.Sequential()
-	#convolutional layers
-	model.add(keras.layers.Conv2D(128,kernel_size=(5,5),padding='same',activation=('relu'), input_shape=(100,100,3)))
-	model.add(keras.layers.BatchNormalization())
-	model.add(keras.layers.MaxPooling2D(pool_size=(poolSize)))
-	model.add(keras.layers.Dropout(dropout))
+def trainGenerator(size, batch):
+	return train_datagen.flow_from_directory(
+        './data/train/',  # this is the target directory
+        target_size=size,  # all images will be resized to 150x150
+        batch_size=batch,
+        class_mode='binary')  # since we use binary_crossentropy loss, we need binary labels
 
-	model.add(keras.layers.Conv2D(256,kernel_size=(5,5),padding='same',activation=('relu')))
-	model.add(keras.layers.BatchNormalization())
-	model.add(keras.layers.MaxPooling2D(pool_size=(poolSize)))
-	model.add(keras.layers.Dropout(dropout))
-
-	model.add(keras.layers.Conv2D(512,kernel_size=(5,5),padding='same',activation=('relu')))
-	model.add(keras.layers.BatchNormalization())
-	model.add(keras.layers.MaxPooling2D(pool_size=(poolSize)))
-	model.add(keras.layers.Dropout(dropout))
-
-	model.add(keras.layers.Conv2D(1024,kernel_size=(5,5),padding='same',activation=('relu')))
-	model.add(keras.layers.BatchNormalization())
-	model.add(keras.layers.MaxPooling2D(pool_size=(poolSize)))
-	model.add(keras.layers.Dropout(dropout))
-
-	model.add(keras.layers.Conv2D(512,kernel_size=(5,5),padding='same',activation=('relu')))
-	model.add(keras.layers.BatchNormalization())
-	model.add(keras.layers.MaxPooling2D(pool_size=(poolSize)))
-	model.add(keras.layers.Dropout(dropout))
-
-	model.add(keras.layers.Conv2D(256,kernel_size=(5,5),padding='same',activation=('relu')))
-	model.add(keras.layers.BatchNormalization())
-	model.add(keras.layers.MaxPooling2D(pool_size=(poolSize)))
-	model.add(keras.layers.Dropout(dropout))
-
-	#flatten
-	model.add(keras.layers.Flatten())
-	#Dense layers
-	model.add(keras.layers.Dense(2048))
-	model.add(keras.layers.BatchNormalization())
-	model.add(keras.layers.Activation('relu'))
-	model.add(keras.layers.Dropout(dropout))
-
-	model.add(keras.layers.Dense(1024))
-	model.add(keras.layers.BatchNormalization())
-	model.add(keras.layers.Activation('relu'))
-	model.add(keras.layers.Dropout(dropout))
-
-	model.add(keras.layers.Dense(512))
-	model.add(keras.layers.BatchNormalization())
-	model.add(keras.layers.Activation('relu'))
-	model.add(keras.layers.Dropout(dropout))
-
-	model.add(keras.layers.Dense(256))
-	model.add(keras.layers.BatchNormalization())
-	model.add(keras.layers.Activation('relu'))
-	model.add(keras.layers.Dropout(dropout))
-
-	model.add(keras.layers.Dense(32))
-	model.add(keras.layers.BatchNormalization())
-	model.add(keras.layers.Activation('relu'))
-	model.add(keras.layers.Dropout(dropout))
-
-	#final softmax layer
-	model.add(keras.layers.Dense(2,activation='softmax'))
-	#compile
-	model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.adam(),metrics=['accuracy'])
-	return model
-
-def testModel(data, labels, model):
-	correct=0
-	datum=np.zeros((1,100,100,3),np.float16,'C')
-	for x in range(len(data)):
-		datum[0]=data[x]
-		prediction=model.predict(datum)
-		if np.argmax(prediction) == 0:
-			#cats
-			if labels[x][0]==1:correct+=1
-		else:
-			#dogs
-			if labels[x][0]==0:correct+=1
-	return correct/len(labels)
-
-def importDataset(folderName):
-	#grab files and initilize new arrays
-	files=glob.glob('./'+folderName+'/*.jpg')
-	data=np.zeros(((len(files)),100,100,3),np.float16,'C')
-	labels=np.zeros((len(files),2))
-	#for each file...
-	letterIndex=files[0].rfind("/")+1
-
-	for x in range(len(files)):
-		try:
-		#open, convert to array, then close
-			pic=Image.open(files[x])
-			picture=np.asarray(pic)
-			pic.close()
-			#set to the correct list
-			data[x]=picture
-		except: print('Error occured. Couldnt open picture:',files[x])
-		if files[x][letterIndex] == "d": labels[x]=[0,1]
-		else: labels[x]=[1,0]
-	return(data,labels)
+def validationGenerator(size, batch):
+# this is a similar generator, for validation data
+	return test_datagen.flow_from_directory(
+        './data/testLabeled/',
+        target_size=size,
+        batch_size=batch,
+        class_mode='binary')
 
 
-def shuffleData(data,labels):
-	perm=np.random.permutation(data.shape[0])
-	return(data[perm],labels[perm])
+def trainAndSaveGenerator(model,epochs,name,target_size,batch_size,model_save_filepath):
+	#print info and start epoch
+	model.fit_generator(
+		trainGenerator(target_size,batch_size),
+		steps_per_epoch=25000 // batch_size,
+		#steps_per_epoch=trainDataLenP // batch_size,
+		epochs=epochs,
+		validation_data=validationGenerator(target_size,batch_size),
+		validation_steps=1000 // batch_size,
+		#validation_steps=validDataLenP // batch_size,
+		verbose=1,
+		max_queue_size=16,
+		use_multiprocessing=True,
+		workers=12,
+		callbacks=[
+			EarlyStopping(patience=6, monitor='val_acc'),
+			ModelCheckpoint(model_save_filepath, monitor='val_acc', save_best_only=False),
+			ReduceLROnPlateau(patience=3,factor=0.4,min_lr=0.001)
+		])
+
+#~95%
+def model_original():
+
+	dropout=0.2
+	kernel_size=(3,3)
+	pool_size=(2,2)
+	image_size=256
+	target_size=(256,256)
+	epochs=120
+	name='model-1'
+	batch_size=64
+	filepath='./models/'+name+'.{epoch:02d}-{val_acc:.2f}.hdf5'
 
 
-def adjustBatchSize(acc):
-	if acc<=.5:
-		return 128
-	elif acc<=.75:
-		return 256
-	elif acc<=.85:
-		return 512
-	elif acc<=.90:
-		return 1024
-	else:
-		return 2048
+	#receptive field size = prevLayerRCF + (K-1) * jumpSize
+	#featOut = ceil((featIn + 2*padding - K)/strideLen)+1
+	#jumpOut = (featInit-featOut)/featOut-1  OR  stride*JumpIn
+
+	model = Sequential()
+	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', input_shape=(image_size, image_size, 3), kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	#model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+	#receptive field size = 1 + (3-1) * 1 = 3
+	#real Filter size = 3
+	#c = 1
+
+	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+	#RFS = 3 + 2 * 1 = 5
+	#FilterSize = 3
+	#c = 3 / 5 = 0.6
+
+	model.add(Conv2D(256, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	#model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+	#RFS = 5+2=7
+	#c = 3 / 7 = 0.42
+
+	model.add(Conv2D(256, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+	#RFS= 9
+	#c = 3 / 9 = 0.33
+
+	model.add(Conv2D(512, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	#model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+	#RFS = 11
+	#c = 3/11 = 0.2727
+
+	model.add(Conv2D(512, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+	#RFS = 13
+	#c = 3/13 = 0.23
+
+	model.add(Conv2D(1024, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+	#RFS = 15
+	#c = 3/15 = 0.2
+
+	model.add(Conv2D(1024, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
+	model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(Dropout(dropout))
+	#RFS = 17
+	#c = 3/17 = 0.17 
+	#this is perfect, it should get as close to 1/6 = 0.16 without going below
+	#it might be worth putting in a stride len > 1, which would increase Receptive Field Size, and therefore allow the model to see more of the big picture
+	#this may also mean removing some of the deeper convolutional layers. This could be rectified by increasing kernal size
+
+	model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
+
+	model.add(Dense(256, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(128, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(64, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	model.add(Dense(32, kernel_initializer=initializers.lecun_normal(seed=None)))
+	model.add(Activation('relu'))
+	model.add(Dropout(dropout))
+
+	#it might be good to try freezing all convolution layers or all layers except last 32 Dense and training that specific layer to be more accurate.
+
+	model.add(Dense(1))
+	model.add(Activation('sigmoid'))
+
+	model.compile(loss='binary_crossentropy',
+	              optimizer='adam',
+	              metrics=['accuracy'])
+
+	trainAndSaveGenerator(model,epochs,name,target_size,batch_size,filepath)
+
+def modelStart(modelName):
+	try:
+		modelName()
+		return True
+	except KeyboardInterrupt as e:
+		print('KeyboardInterrupt detected, ending training')
+		return False
 
 
 def main():
-	#make the network
-	print('making network')
-	network=makeNetwork()
-	print('Done making network')
-
-
-	#try to get both data sets
-	print('importing data')
-	try:
-		data,labels=importDataset('trainFormatted')
-		testData,testLabels=importDataset('testFormatted')
-	except FileNotFoundError as e: print(e,'Could not find data. Please try again')
-	print('Done importing data')
-
-
-	#Continue executing epochs until error starts increasing
-	print('training network')
-	prevAcc=0.0
-	acc=0.4
-	counter=0
-	batchSize=128
-	while acc>=prevAcc:
-		#switch error and model in prep for new epoch
-		prevAcc=acc
-		prevModel=network
-		counter+=1
-		#execute epoch
-		network.fit(x=data,y=labels,batch_size=batchSize,epochs=1,verbose=1)
-		#shuffle data to normalize & remove bias
-		data,labels=shuffleData(data,labels)
-		#calculate error of new model
-		acc=round(testModel(testData,testLabels,network),3)
-		#adjust batch size according to accuracy
-		batchSize=adjustBatchSize(acc)
-		print('Accuracy before epoch: ',prevAcc,'Accuracy after epoch: ',acc)
-		network.save('trainedModel'+str(counter)+'.dnn',include_optimizer=False)
-	print('Finished!')
+	while not modelStart(model_original):
+		if input('Would you like to restart this model? (y or n) ')==n:
+			break
 
 if __name__ == '__main__':
 	main()
