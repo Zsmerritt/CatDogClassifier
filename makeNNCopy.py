@@ -114,7 +114,7 @@ def trainAndSave(model,epochs,name,target_size):
 		for x in range(0,epochs):
 			#update batch_size 
 			batch_size=calBatchSize(x+1,epochs)
-			steps_per_epoch_train=1#25000//batch_size
+			steps_per_epoch_train=25000//batch_size
 			epoch_desc='MODEL: '+str(name)+'  CURRENT EPOCH: '+str(x+1)+"/"+str(epochs)+'  BATCH SIZE: '+str(batch_size)
 			for y in tqdm(range(steps_per_epoch_train), desc=epoch_desc):
 
@@ -220,16 +220,16 @@ def model_original():
 	#jumpOut = (featInit-featOut)/featOut-1  OR  stride*JumpIn
 
 	model = Sequential()
-	model.add(Conv2D(32, kernel_size=kernel_size, padding='same', input_shape=(image_size, image_size, 3), kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', input_shape=(image_size, image_size, 3), kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
-	model.add(MaxPooling2D(pool_size=pool_size))
+	#model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 	#receptive field size = 1 + (3-1) * 1 = 3
 	#real Filter size = 3
 	#c = 1
 
-	model.add(Conv2D(32, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
@@ -238,15 +238,15 @@ def model_original():
 	#FilterSize = 3
 	#c = 3 / 5 = 0.6
 
-	model.add(Conv2D(64, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Conv2D(256, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
-	model.add(MaxPooling2D(pool_size=pool_size))
+	#model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 	#RFS = 5+2=7
 	#c = 3 / 7 = 0.42
 
-	model.add(Conv2D(64, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Conv2D(256, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
@@ -254,15 +254,15 @@ def model_original():
 	#RFS= 9
 	#c = 3 / 9 = 0.33
 
-	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Conv2D(512, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
-	model.add(MaxPooling2D(pool_size=pool_size))
+	#model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 	#RFS = 11
 	#c = 3/11 = 0.2727
 
-	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Conv2D(512, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
@@ -270,7 +270,7 @@ def model_original():
 	#RFS = 13
 	#c = 3/13 = 0.23
 
-	model.add(Conv2D(256, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Conv2D(1024, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
@@ -278,7 +278,7 @@ def model_original():
 	#RFS = 15
 	#c = 3/15 = 0.2
 
-	model.add(Conv2D(256, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
+	model.add(Conv2D(1024, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
 	model.add(MaxPooling2D(pool_size=pool_size))
@@ -617,11 +617,10 @@ def main():
 	while not modelStart(model_original):
 		if input('Would you like to restart this model? (y or n) ')==n:
 			break
-	
+	'''
 	while not modelStart(model_1):
 		if input('Would you like to restart this model? (y or n) ')==n:
 			break
-	'''
 	while not modelStart(model_2):
 		if input('Would you like to restart this model? (y or n) ')==n:
 			break
