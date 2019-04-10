@@ -15,6 +15,7 @@ from copy import deepcopy
 import gc
 import dataGen
 from tqdm import tqdm
+from keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
 
 train_transform_map = dataGen.get_transform_map(
 	data_folder='./data/train/',
