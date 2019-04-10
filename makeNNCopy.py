@@ -301,7 +301,7 @@ def model_original():
 	              optimizer='adam',
 	              metrics=['accuracy'])
 
-	trainAndSaveGenerator(model,epochs,name,target_size,batch_size,model_save_filepath)
+	trainAndSaveGenerator(model,epochs,name,target_size,batch_size,filepath)
 
 
 #added in two additional conv layers
