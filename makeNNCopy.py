@@ -211,7 +211,7 @@ def model_original():
 	dropout=0.2
 	kernel_size=(3,3)
 	pool_size=(2,2)
-	image_size=300
+	image_size=256
 	epochs=120
 	name='og'
 
