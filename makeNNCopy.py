@@ -29,6 +29,18 @@ train_transform_map = dataGen.get_transform_map(
 
 valid_transform_map = dataGen.get_transform_map(data_folder='./data/testLabeled/', rescale=1./255)
 
+train_datagen = ImageDataGenerator(
+		rescale=1./255,
+		horizontal_flip=True,
+		vertical_flip=True,
+		fill_mode='nearest',
+		brightness_range=(0.0,1.5),
+		shear_range=0.2,
+    	zoom_range=0.2)
+
+test_datagen = ImageDataGenerator(rescale=1./255)
+
+
 
 '''
 print('generating validation data')
