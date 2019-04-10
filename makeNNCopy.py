@@ -59,49 +59,30 @@ def shuffleData(data_dict):
 	perm=np.random.permutation(data_dict['data'].shape[0])
 	data_dict['data'],data_dict['labels']=data_dict['data'][perm],data_dict['labels'][perm]
 
-def trainAndSaveGenerator(model,epochs,name,image_size,trainDataLen,validDataLen):
+#using generator
+def trainAndSaveGenerator(model,epochs,name,target_size,batch_size,model_save_filepath):
 	#hold on to best model to save after training
-	bestModel=model
-	bestModelLoss,bestModelAcc=1.0,0.0
+	trainGen=trainGenerator(target_size,batch_size)
+	validGen=validationGenerator(target_size,batch_size)
+	#print info and start epoch
+	hist=model.fit_generator(
+			trainGen,
+			steps_per_epoch=trainDataLen // batch_size,
+			#steps_per_epoch=trainDataLenP // batch_size,
+			epochs=epochs,
+			validation_data=validGen,
+			validation_steps=validDataLen // batch_size,
+			#validation_steps=validDataLenP // batch_size,
+			verbose=1,
+			max_queue_size=16,
+			#use_multiprocessing=True,
+			#workers=2,
+			callbacks=[
+				EarlyStopping(patience=6, moniter='val_acc'),
+				ReduceLROnPlateau(patience=3,factor=0.4,min_lr=0.001),
+				ModelCheckpoint(model_save_filepath, monitor='val_acc', save_best_only=True)
 
-	#moved these out of loop to solve mem alocation prob
-	initBatchSize=16
-	trainGen=trainGenerator(image_size,initBatchSize)
-	validGen=validationGenerator(image_size,initBatchSize)
-
-	for x in range(1,epochs+1):
-		#print infor and adjust batch size
-		print('MODEL: ',name,' CURRENT EPOCH:',x)
-		batch_size=calBatchSize(x,epochs)
-		#update generators only when batch size changes
-		if batch_size!=initBatchSize:
-			trainGen=None
-			validGen=None
-			#garbage collector to run before new generator allocation to reduce memory usuage
-			gc.collect()
-			initBatchSize=batch_size
-			trainGen=trainGenerator(image_size,batch_size)
-			validGen=validationGenerator(image_size,batch_size)
-
-
-		#fit model
-		model.fit_generator(
-		        trainGen,
-		        steps_per_epoch=trainDataLen // batch_size,
-		        epochs=1,
-		        validation_data=validGen,
-		        validation_steps=validDataLen // batch_size,
-		        verbose=1,
-		        max_queue_size=16)
-		#cal loss and accuracy before comparing to previous best model
-		loss,acc=model.evaluate_generator(validGen)
-		if bestModelAcc<acc and bestModelLoss>loss:
-			bestModel=deepcopy(model)
-			bestModelLoss,bestModelAcc=loss,acc
-	#save best model created
-	bestModel.save_weights('./weights/weights_'+name+'_'+str(round(bestModelAcc,5))+'.h5')
-	bestModel.save('./models/model_'+name+'_'+str(round(bestModelAcc,5))+'.dnn') 
-
+			])
 
 #trains on batch
 def trainAndSave(model,epochs,name,target_size):
@@ -212,8 +193,12 @@ def model_original():
 	kernel_size=(3,3)
 	pool_size=(2,2)
 	image_size=256
+	target_size=(256,256)
 	epochs=120
-	name='og'
+	name='model-1'
+	batch_size=64
+	filepath='./models/'+name+'.{epoch:02d}-{val_acc:.2f}.hdf5'
+
 
 	#receptive field size = prevLayerRCF + (K-1) * jumpSize
 	#featOut = ceil((featIn + 2*padding - K)/strideLen)+1
@@ -316,7 +301,8 @@ def model_original():
 	              optimizer='adam',
 	              metrics=['accuracy'])
 
-	trainAndSave(model,epochs,name,target_size=(image_size,image_size))
+	trainAndSaveGenerator(model,epochs,name,target_size,batch_size,model_save_filepath)
+
 
 #added in two additional conv layers
 def model_1():
