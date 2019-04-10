@@ -78,11 +78,11 @@ def trainAndSaveGenerator(model,epochs,name,target_size,batch_size,model_save_fi
 	#print info and start epoch
 	hist=model.fit_generator(
 			trainGen,
-			steps_per_epoch=trainDataLen // batch_size,
+			steps_per_epoch=25000 // batch_size,
 			#steps_per_epoch=trainDataLenP // batch_size,
 			epochs=epochs,
 			validation_data=validGen,
-			validation_steps=validDataLen // batch_size,
+			validation_steps=1000 // batch_size,
 			#validation_steps=validDataLenP // batch_size,
 			verbose=1,
 			max_queue_size=16,
