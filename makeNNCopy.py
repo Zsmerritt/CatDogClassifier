@@ -90,7 +90,7 @@ def trainAndSaveGenerator(model,epochs,name,target_size,batch_size,model_save_fi
 			#use_multiprocessing=True,
 			#workers=2,
 			callbacks=[
-				EarlyStopping(patience=6, moniter='val_acc'),
+				EarlyStopping(patience=6, monitor='val_acc'),
 				ReduceLROnPlateau(patience=3,factor=0.4,min_lr=0.001),
 				ModelCheckpoint(model_save_filepath, monitor='val_acc', save_best_only=True)
 
