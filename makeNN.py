@@ -39,17 +39,15 @@ def trainAndSaveGenerator(model,epochs,name,target_size,batch_size,model_save_fi
 	model.fit_generator(
 		trainGenerator(target_size,batch_size),
 		steps_per_epoch=25000 // batch_size,
-		#steps_per_epoch=trainDataLenP // batch_size,
 		epochs=epochs,
 		validation_data=validationGenerator(target_size,batch_size),
 		validation_steps=1000 // batch_size,
-		#validation_steps=validDataLenP // batch_size,
 		verbose=1,
 		max_queue_size=16,
 		use_multiprocessing=True,
-		workers=12,
+		workers=8,
 		callbacks=[
-			EarlyStopping(patience=6, monitor='val_acc'),
+			EarlyStopping(patience=10, monitor='val_acc'),
 			ModelCheckpoint(model_save_filepath, monitor='val_acc', save_best_only=False),
 			ReduceLROnPlateau(patience=3,factor=0.4,min_lr=0.001)
 		])
@@ -76,7 +74,7 @@ def model_original():
 	model.add(Conv2D(128, kernel_size=kernel_size, padding='same', input_shape=(image_size, image_size, 3), kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
-	#model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 	#receptive field size = 1 + (3-1) * 1 = 3
 	#real Filter size = 3
@@ -110,7 +108,7 @@ def model_original():
 	model.add(Conv2D(512, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
 	model.add(Activation('relu'))
 	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
-	#model.add(MaxPooling2D(pool_size=pool_size))
+	model.add(MaxPooling2D(pool_size=pool_size))
 	model.add(Dropout(dropout))
 	#RFS = 11
 	#c = 3/11 = 0.2727
@@ -122,25 +120,6 @@ def model_original():
 	model.add(Dropout(dropout))
 	#RFS = 13
 	#c = 3/13 = 0.23
-
-	model.add(Conv2D(1024, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
-	model.add(Activation('relu'))
-	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
-	model.add(MaxPooling2D(pool_size=pool_size))
-	model.add(Dropout(dropout))
-	#RFS = 15
-	#c = 3/15 = 0.2
-
-	model.add(Conv2D(1024, kernel_size=kernel_size, padding='same', kernel_initializer=initializers.he_normal(seed=None)))
-	model.add(Activation('relu'))
-	model.add(BatchNormalization(momentum=0.99, epsilon=0.001))
-	model.add(MaxPooling2D(pool_size=pool_size))
-	model.add(Dropout(dropout))
-	#RFS = 17
-	#c = 3/17 = 0.17 
-	#this is perfect, it should get as close to 1/6 = 0.16 without going below
-	#it might be worth putting in a stride len > 1, which would increase Receptive Field Size, and therefore allow the model to see more of the big picture
-	#this may also mean removing some of the deeper convolutional layers. This could be rectified by increasing kernal size
 
 	model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
 
